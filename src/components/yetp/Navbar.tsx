@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX } from "react-icons/fi";
 import { cn } from "@/lib/utils";
 import { LinkButton } from "./primitives";
+import logoAsset from "@/assets/logo-yetp.png.asset.json";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -35,9 +36,7 @@ export function Navbar() {
     >
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 sm:px-8">
         <Link to="/" className="group flex items-center gap-2">
-          <div className="relative grid size-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-light glow-brand">
-            <span className="font-display text-sm font-bold text-white">Y</span>
-          </div>
+          <img src={logoAsset.url} alt="YETP" className="size-10 object-contain transition-transform group-hover:scale-105" />
           <div className="leading-none">
             <div className="font-display text-lg font-bold tracking-tight">YETP</div>
             <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Learn · Lead · Change</div>

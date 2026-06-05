@@ -3,6 +3,7 @@ import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube, FaWhatsapp } from "r
 import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
 import { courses } from "@/data/yetp";
 import { Container } from "./primitives";
+import logoAsset from "@/assets/logo-yetp.png.asset.json";
 
 export function Footer() {
   return (
@@ -12,9 +13,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-light">
-                <span className="font-display text-sm font-bold text-white">Y</span>
-              </div>
+              <img src={logoAsset.url} alt="YETP" className="size-10 object-contain" />
               <div>
                 <div className="font-display text-lg font-bold">YETP</div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Learn · Lead · Change</div>
