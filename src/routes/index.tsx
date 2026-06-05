@@ -1,29 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { HeroSection, ScholarshipBanner, WhyYETP, CoursesSection, FoundersSection, MissionVisionSection, TestimonialsSection, CTASection } from "@/components/yetp/sections";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "YETP — Build Your Dream Big. Start Today." },
+      { name: "description", content: "Pakistan's #1 youth empowerment IT institute. Premium courses, real internships, Rs.100,000 scholarship and global career pathways." },
+      { property: "og:title", content: "YETP — Build Your Dream Big. Start Today." },
+      { property: "og:description", content: "Premium courses, real internships and global career pathways for Pakistan's youth." },
+      { property: "og:url", content: "/" },
     ],
+    links: [{ rel: "canonical", href: "/" }],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <HeroSection />
+      <ScholarshipBanner />
+      <WhyYETP />
+      <CoursesSection />
+      <MissionVisionSection />
+      <FoundersSection />
+      <TestimonialsSection />
+      <CTASection />
+    </>
   );
 }
