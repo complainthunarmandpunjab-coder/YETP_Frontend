@@ -122,22 +122,23 @@ export function ScholarshipBanner() {
 /* ---------------- Why YETP ---------------- */
 export function WhyYETP() {
   return (
-    <section className="py-24">
+    <section className="section-light relative py-24">
+      <div className="gov-rule absolute inset-x-0 top-0" />
       <Container>
         <SectionHeading
           eyebrow="Why YETP"
-          title={<>The platform built for <span className="text-gradient-brand">unfair advantage.</span></>}
+          title={<>The platform built for <span className="text-gradient-deep">unfair advantage.</span></>}
           description="Every detail engineered so a hungry student in Karachi can compete with talent in Karāchi, Lahore or London."
         />
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <FadeIn key={f.title} delay={i * 0.05}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/8 bg-card/60 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-brand-light/60 hover:glow-brand">
-                <div className="absolute -right-10 -top-10 size-32 rounded-full bg-brand-light/10 blur-3xl transition-opacity group-hover:opacity-100" />
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-black/8 bg-white p-7 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:border-brand/40 hover:shadow-xl">
+                <div className="absolute -right-10 -top-10 size-32 rounded-full bg-brand/10 blur-3xl" />
                 <div className="grid size-12 place-items-center rounded-xl bg-gradient-to-br from-brand to-brand-light text-white">
                   <f.icon className="size-5" />
                 </div>
-                <h3 className="mt-5 text-xl font-semibold">{f.title}</h3>
+                <h3 className="mt-5 text-xl font-semibold text-foreground">{f.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{f.desc}</p>
               </div>
             </FadeIn>
@@ -152,7 +153,8 @@ export function WhyYETP() {
 export function CoursesSection({ limit }: { limit?: number }) {
   const list = typeof limit === "number" ? courses.slice(0, limit) : courses;
   return (
-    <section className="py-24">
+    <section className="section-deep relative py-24">
+      <div className="gov-rule absolute inset-x-0 top-0" />
       <Container>
         <SectionHeading
           eyebrow="Programs"
@@ -200,25 +202,26 @@ export function CoursesSection({ limit }: { limit?: number }) {
 /* ---------------- Founders ---------------- */
 export function FoundersSection() {
   return (
-    <section className="py-24">
+    <section className="section-cream relative py-24">
+      <div className="gov-rule absolute inset-x-0 top-0" />
       <Container>
         <SectionHeading
           eyebrow="Founders"
-          title={<>Engineers behind the <span className="text-gradient-brand">movement.</span></>}
+          title={<>Engineers behind the <span className="text-gradient-deep">movement.</span></>}
           description="Builders, not bureaucrats. YETP is run by people who ship."
         />
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {founders.map((f, i) => (
             <FadeIn key={f.name} delay={i * 0.1}>
-              <div className="group relative overflow-hidden rounded-3xl border border-white/8 bg-card/60 p-8 transition-all duration-500 hover:border-brand-light/50">
-                <div className="absolute -right-20 -top-20 size-60 rounded-full bg-brand-light/10 blur-3xl" />
+              <div className="group relative overflow-hidden rounded-3xl border border-black/8 bg-white p-8 shadow-sm transition-all duration-500 hover:border-brand/40 hover:shadow-xl">
+                <div className="absolute -right-20 -top-20 size-60 rounded-full bg-brand/10 blur-3xl" />
                 <div className="flex items-start gap-5">
                   <div className="grid size-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand to-brand-light font-display text-2xl font-bold text-white">
                     {f.name.split(" ").slice(-2).map((n) => n[0]).join("")}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-semibold">{f.name}</h3>
-                    <div className="mt-1 text-sm text-gold">{f.role}</div>
+                    <h3 className="text-2xl font-semibold text-foreground">{f.name}</h3>
+                    <div className="mt-1 text-sm font-medium text-brand">{f.role}</div>
                     <p className="mt-3 text-sm text-muted-foreground">{f.bio}</p>
                   </div>
                 </div>
@@ -234,23 +237,24 @@ export function FoundersSection() {
 /* ---------------- Mission / Vision / Pillars ---------------- */
 export function MissionVisionSection() {
   return (
-    <section className="py-24">
+    <section className="section-light relative py-24">
+      <div className="gov-rule absolute inset-x-0 top-0" />
       <Container>
         <div className="grid gap-6 md:grid-cols-2">
           <FadeIn>
-            <div className="h-full rounded-3xl border border-white/8 bg-card/60 p-8">
-              <div className="text-xs uppercase tracking-[0.2em] text-brand-light">Our Mission</div>
-              <p className="mt-3 text-2xl font-medium leading-tight">
-                Empower <span className="text-gradient-brand">1 million</span> Pakistani youth with
+            <div className="h-full rounded-3xl border-l-4 border-brand bg-white p-8 shadow-sm">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Our Mission</div>
+              <p className="mt-3 text-2xl font-medium leading-tight text-foreground">
+                Empower <span className="text-gradient-deep">1 million</span> Pakistani youth with
                 world-class skills and pathways to dignified, high-earning work.
               </p>
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
-            <div className="h-full rounded-3xl border border-white/8 bg-card/60 p-8">
-              <div className="text-xs uppercase tracking-[0.2em] text-gold">Our Vision</div>
-              <p className="mt-3 text-2xl font-medium leading-tight">
-                A Pakistan where <span className="text-gradient-brand">talent</span> — not background —
+            <div className="h-full rounded-3xl border-l-4 border-gold bg-white p-8 shadow-sm">
+              <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:oklch(0.55_0.14_80)]">Our Vision</div>
+              <p className="mt-3 text-2xl font-medium leading-tight text-foreground">
+                A Pakistan where <span className="text-gradient-deep">talent</span> — not background —
                 decides how far a young person can go.
               </p>
             </div>
@@ -258,20 +262,20 @@ export function MissionVisionSection() {
         </div>
 
         <FadeIn delay={0.15}>
-          <blockquote className="mt-10 rounded-3xl border border-white/8 bg-gradient-to-br from-card/80 to-card/30 p-10 text-center">
+          <blockquote className="mt-10 rounded-3xl bg-gradient-to-br from-brand to-[oklch(0.32_0.08_165)] p-10 text-center text-white">
             <div className="font-display text-2xl leading-relaxed sm:text-3xl">
-              “We don't train students. We <span className="text-gradient-brand">manufacture careers</span>.”
+              “We don't train students. We <span className="text-gold">manufacture careers</span>.”
             </div>
-            <div className="mt-4 text-sm text-muted-foreground">— YETP Founding Team</div>
+            <div className="mt-4 text-sm text-white/70">— YETP Founding Team</div>
           </blockquote>
         </FadeIn>
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {pillars.map((p, i) => (
             <FadeIn key={p.title} delay={i * 0.05}>
-              <div className="h-full rounded-2xl border border-white/8 bg-card/60 p-6">
-                <div className="font-display text-3xl font-bold text-gradient-brand">0{i + 1}</div>
-                <h4 className="mt-3 text-lg font-semibold">{p.title}</h4>
+              <div className="h-full rounded-2xl border border-black/8 bg-white p-6 shadow-sm">
+                <div className="font-display text-3xl font-bold text-gradient-deep">0{i + 1}</div>
+                <h4 className="mt-3 text-lg font-semibold text-foreground">{p.title}</h4>
                 <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
               </div>
             </FadeIn>
