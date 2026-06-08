@@ -60,7 +60,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/8 pt-6 text-xs text-muted-foreground md:flex-row">
-          <span>© {new Date().getFullYear()} YETP — Youth Empowerment Training Program. All rights reserved.</span>
+          <span>© 2025 YETP — Youth Empowerment Training Program. All rights reserved.</span>
           <span>Built with intention. Designed for impact.</span>
         </div>
       </Container>
