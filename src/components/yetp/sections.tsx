@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { FiArrowRight, FiPhone, FiCheck, FiStar } from "react-icons/fi";
 import { HiOutlineSparkles } from "react-icons/hi2";
 import { Container, FadeIn, LinkButton, SectionHeading } from "./primitives";
-import { courses, features, founders, pillars, stats, testimonials } from "@/data/yetp";
+import { courses, features, founders, partners, pillars, stats, testimonials } from "@/data/yetp";
 import { useState } from "react";
 
 /* ---------------- Hero ---------------- */
@@ -34,7 +34,7 @@ export function HeroSection() {
               className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs"
             >
               <HiOutlineSparkles className="text-gold" />
-              <span className="text-white/90">3 Years of Undefeated Success</span>
+              <span className="text-white/90">Build Your Dream Big · 3 Years of Undefeated Success</span>
             </motion.div>
 
             <motion.h1
@@ -43,8 +43,7 @@ export function HeroSection() {
               transition={{ duration: 0.7, delay: 0.05 }}
               className="mt-6 text-5xl font-bold leading-[0.95] sm:text-6xl md:text-7xl"
             >
-              Build Your Dream <span className="text-gradient-brand">Big.</span>
-              <br />Start Today.
+              Vision Got <span className="text-gradient-brand">Bigger.</span>
             </motion.h1>
 
             <motion.p
@@ -53,8 +52,9 @@ export function HeroSection() {
               transition={{ duration: 0.7, delay: 0.15 }}
               className="mt-6 max-w-xl text-base text-muted-foreground sm:text-lg"
             >
-              YETP empowers Pakistan's youth with industry-grade skills, real internships and
-              global career pathways — at a fee anyone can afford.
+              Welcome to the Youth Empowerment Training Program (YETP). We fill the skill gap
+              and produce future entrepreneurs and self-employees through Premium Diplomas
+              and Freelancing Courses — at the minimum fee under one roof.
             </motion.p>
 
             <motion.div
@@ -64,11 +64,9 @@ export function HeroSection() {
               className="mt-8 flex flex-wrap gap-3"
             >
               <LinkButton to="/enroll" variant="primary">
-                Enroll Now <FiArrowRight />
+                Apply Now <FiArrowRight />
               </LinkButton>
-              <LinkButton to="/courses" variant="outline">
-                Browse Courses
-              </LinkButton>
+              <LinkButton to="/contact" variant="outline">Contact Us</LinkButton>
             </motion.div>
           </div>
 
@@ -240,13 +238,19 @@ export function MissionVisionSection() {
     <section className="section-light relative py-24">
       <div className="gov-rule absolute inset-x-0 top-0" />
       <Container>
+        <SectionHeading
+          eyebrow="LEARN, LEAD, and CHANGE"
+          title={<>Thrive in business today — with a plan to <span className="text-gradient-deep">LEAD, LEARN, CHANGE</span>.</>}
+          description="YETP is the name of LEARN, LEAD & CHANGE — built to empower Pakistan's youth through skills, opportunity and entrepreneurship."
+        />
         <div className="grid gap-6 md:grid-cols-2">
           <FadeIn>
             <div className="h-full rounded-3xl border-l-4 border-brand bg-white p-8 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Our Mission</div>
               <p className="mt-3 text-2xl font-medium leading-tight text-foreground">
-                Empower <span className="text-gradient-deep">1 million</span> Pakistani youth with
-                world-class skills and pathways to dignified, high-earning work.
+                Train <span className="text-gradient-deep">1 Million</span> youth of Pakistan in
+                emerging technologies — creating employment, empowering entrepreneurship and
+                contributing to the 4.0 Industrial Revolution.
               </p>
             </div>
           </FadeIn>
@@ -254,8 +258,8 @@ export function MissionVisionSection() {
             <div className="h-full rounded-3xl border-l-4 border-gold bg-white p-8 shadow-sm">
               <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:oklch(0.55_0.14_80)]">Our Vision</div>
               <p className="mt-3 text-2xl font-medium leading-tight text-foreground">
-                A Pakistan where <span className="text-gradient-deep">talent</span> — not background —
-                decides how far a young person can go.
+                Reduce unemployment and empower Pakistan's youth — every skilled graduate
+                ready for opportunities in the <span className="text-gradient-deep">global market</span>.
               </p>
             </div>
           </FadeIn>
@@ -277,6 +281,31 @@ export function MissionVisionSection() {
                 <div className="font-display text-3xl font-bold text-gradient-deep">0{i + 1}</div>
                 <h4 className="mt-3 text-lg font-semibold text-foreground">{p.title}</h4>
                 <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
+              </div>
+            </FadeIn>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------------- Partners ---------------- */
+export function PartnersSection() {
+  return (
+    <section className="section-cream relative py-20">
+      <div className="gov-rule absolute inset-x-0 top-0" />
+      <Container>
+        <SectionHeading
+          eyebrow="Trust and Worth"
+          title={<>Our <span className="text-gradient-deep">Supporting Partners</span></>}
+          description="Industry partners powering YETP internships, mentorship and hiring pipelines."
+        />
+        <div className="mt-12 grid grid-cols-2 items-center gap-6 sm:grid-cols-3 lg:grid-cols-4">
+          {partners.map((p, i) => (
+            <FadeIn key={p.name} delay={i * 0.04}>
+              <div className="grid h-28 place-items-center rounded-2xl border border-black/8 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                <img src={p.logo} alt={p.name} loading="lazy" className="max-h-16 w-auto object-contain" />
               </div>
             </FadeIn>
           ))}
