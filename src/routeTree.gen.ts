@@ -9,12 +9,70 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TeamRouteImport } from './routes/team'
+import { Route as SuccessStoryRouteImport } from './routes/success-story'
+import { Route as LmsRouteImport } from './routes/lms'
+import { Route as LaptopSchemeRouteImport } from './routes/laptop-scheme'
+import { Route as FeeVerificationRouteImport } from './routes/fee-verification'
+import { Route as FastTrackRouteImport } from './routes/fast-track'
+import { Route as FaqsRouteImport } from './routes/faqs'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as EnrollRouteImport } from './routes/enroll'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CertificateVerificationRouteImport } from './routes/certificate-verification'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as CandidateLoginRouteImport } from './routes/candidate-login'
+import { Route as ApplyPhysicalRouteImport } from './routes/apply-physical'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeamRoute = TeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuccessStoryRoute = SuccessStoryRouteImport.update({
+  id: '/success-story',
+  path: '/success-story',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LmsRoute = LmsRouteImport.update({
+  id: '/lms',
+  path: '/lms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaptopSchemeRoute = LaptopSchemeRouteImport.update({
+  id: '/laptop-scheme',
+  path: '/laptop-scheme',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeeVerificationRoute = FeeVerificationRouteImport.update({
+  id: '/fee-verification',
+  path: '/fee-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FastTrackRoute = FastTrackRouteImport.update({
+  id: '/fast-track',
+  path: '/fast-track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqsRoute = FaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EnrollRoute = EnrollRouteImport.update({
   id: '/enroll',
   path: '/enroll',
@@ -28,6 +86,26 @@ const CoursesRoute = CoursesRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificateVerificationRoute = CertificateVerificationRouteImport.update({
+  id: '/certificate-verification',
+  path: '/certificate-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CandidateLoginRoute = CandidateLoginRouteImport.update({
+  id: '/candidate-login',
+  path: '/candidate-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplyPhysicalRoute = ApplyPhysicalRouteImport.update({
+  id: '/apply-physical',
+  path: '/apply-physical',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -44,43 +122,213 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/apply-physical': typeof ApplyPhysicalRoute
+  '/candidate-login': typeof CandidateLoginRoute
+  '/careers': typeof CareersRoute
+  '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
+  '/events': typeof EventsRoute
+  '/faqs': typeof FaqsRoute
+  '/fast-track': typeof FastTrackRoute
+  '/fee-verification': typeof FeeVerificationRoute
+  '/laptop-scheme': typeof LaptopSchemeRoute
+  '/lms': typeof LmsRoute
+  '/success-story': typeof SuccessStoryRoute
+  '/team': typeof TeamRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/apply-physical': typeof ApplyPhysicalRoute
+  '/candidate-login': typeof CandidateLoginRoute
+  '/careers': typeof CareersRoute
+  '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
+  '/events': typeof EventsRoute
+  '/faqs': typeof FaqsRoute
+  '/fast-track': typeof FastTrackRoute
+  '/fee-verification': typeof FeeVerificationRoute
+  '/laptop-scheme': typeof LaptopSchemeRoute
+  '/lms': typeof LmsRoute
+  '/success-story': typeof SuccessStoryRoute
+  '/team': typeof TeamRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/apply-physical': typeof ApplyPhysicalRoute
+  '/candidate-login': typeof CandidateLoginRoute
+  '/careers': typeof CareersRoute
+  '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
+  '/events': typeof EventsRoute
+  '/faqs': typeof FaqsRoute
+  '/fast-track': typeof FastTrackRoute
+  '/fee-verification': typeof FeeVerificationRoute
+  '/laptop-scheme': typeof LaptopSchemeRoute
+  '/lms': typeof LmsRoute
+  '/success-story': typeof SuccessStoryRoute
+  '/team': typeof TeamRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/contact' | '/courses' | '/enroll'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/apply-physical'
+    | '/candidate-login'
+    | '/careers'
+    | '/certificate-verification'
+    | '/contact'
+    | '/courses'
+    | '/enroll'
+    | '/events'
+    | '/faqs'
+    | '/fast-track'
+    | '/fee-verification'
+    | '/laptop-scheme'
+    | '/lms'
+    | '/success-story'
+    | '/team'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/contact' | '/courses' | '/enroll'
-  id: '__root__' | '/' | '/about' | '/contact' | '/courses' | '/enroll'
+  to:
+    | '/'
+    | '/about'
+    | '/apply-physical'
+    | '/candidate-login'
+    | '/careers'
+    | '/certificate-verification'
+    | '/contact'
+    | '/courses'
+    | '/enroll'
+    | '/events'
+    | '/faqs'
+    | '/fast-track'
+    | '/fee-verification'
+    | '/laptop-scheme'
+    | '/lms'
+    | '/success-story'
+    | '/team'
+    | '/terms'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/apply-physical'
+    | '/candidate-login'
+    | '/careers'
+    | '/certificate-verification'
+    | '/contact'
+    | '/courses'
+    | '/enroll'
+    | '/events'
+    | '/faqs'
+    | '/fast-track'
+    | '/fee-verification'
+    | '/laptop-scheme'
+    | '/lms'
+    | '/success-story'
+    | '/team'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ApplyPhysicalRoute: typeof ApplyPhysicalRoute
+  CandidateLoginRoute: typeof CandidateLoginRoute
+  CareersRoute: typeof CareersRoute
+  CertificateVerificationRoute: typeof CertificateVerificationRoute
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
   EnrollRoute: typeof EnrollRoute
+  EventsRoute: typeof EventsRoute
+  FaqsRoute: typeof FaqsRoute
+  FastTrackRoute: typeof FastTrackRoute
+  FeeVerificationRoute: typeof FeeVerificationRoute
+  LaptopSchemeRoute: typeof LaptopSchemeRoute
+  LmsRoute: typeof LmsRoute
+  SuccessStoryRoute: typeof SuccessStoryRoute
+  TeamRoute: typeof TeamRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/team': {
+      id: '/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/success-story': {
+      id: '/success-story'
+      path: '/success-story'
+      fullPath: '/success-story'
+      preLoaderRoute: typeof SuccessStoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lms': {
+      id: '/lms'
+      path: '/lms'
+      fullPath: '/lms'
+      preLoaderRoute: typeof LmsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/laptop-scheme': {
+      id: '/laptop-scheme'
+      path: '/laptop-scheme'
+      fullPath: '/laptop-scheme'
+      preLoaderRoute: typeof LaptopSchemeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fee-verification': {
+      id: '/fee-verification'
+      path: '/fee-verification'
+      fullPath: '/fee-verification'
+      preLoaderRoute: typeof FeeVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fast-track': {
+      id: '/fast-track'
+      path: '/fast-track'
+      fullPath: '/fast-track'
+      preLoaderRoute: typeof FastTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faqs': {
+      id: '/faqs'
+      path: '/faqs'
+      fullPath: '/faqs'
+      preLoaderRoute: typeof FaqsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/enroll': {
       id: '/enroll'
       path: '/enroll'
@@ -100,6 +348,34 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificate-verification': {
+      id: '/certificate-verification'
+      path: '/certificate-verification'
+      fullPath: '/certificate-verification'
+      preLoaderRoute: typeof CertificateVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/candidate-login': {
+      id: '/candidate-login'
+      path: '/candidate-login'
+      fullPath: '/candidate-login'
+      preLoaderRoute: typeof CandidateLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apply-physical': {
+      id: '/apply-physical'
+      path: '/apply-physical'
+      fullPath: '/apply-physical'
+      preLoaderRoute: typeof ApplyPhysicalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -122,10 +398,33 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ApplyPhysicalRoute: ApplyPhysicalRoute,
+  CandidateLoginRoute: CandidateLoginRoute,
+  CareersRoute: CareersRoute,
+  CertificateVerificationRoute: CertificateVerificationRoute,
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
   EnrollRoute: EnrollRoute,
+  EventsRoute: EventsRoute,
+  FaqsRoute: FaqsRoute,
+  FastTrackRoute: FastTrackRoute,
+  FeeVerificationRoute: FeeVerificationRoute,
+  LaptopSchemeRoute: LaptopSchemeRoute,
+  LmsRoute: LmsRoute,
+  SuccessStoryRoute: SuccessStoryRoute,
+  TeamRoute: TeamRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

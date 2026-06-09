@@ -11,13 +11,13 @@ const buttonBase =
 
 const buttonVariants: Record<ButtonVariant, string> = {
   primary:
-    "bg-gradient-to-r from-brand to-brand-light text-primary-foreground hover:shadow-[0_10px_40px_-10px_var(--brand-light)] hover:-translate-y-0.5",
+    "bg-gradient-to-r from-brand to-brand-light text-white shadow-sm hover:shadow-[0_8px_30px_-8px_var(--brand-light)] hover:-translate-y-0.5",
   gold:
-    "bg-gradient-to-r from-gold to-[oklch(0.85_0.13_85)] text-ink hover:shadow-[0_10px_40px_-10px_var(--gold)] hover:-translate-y-0.5",
+    "bg-gradient-to-r from-gold to-[oklch(0.82_0.14_82)] text-ink font-bold hover:shadow-[0_8px_30px_-8px_var(--gold)] hover:-translate-y-0.5",
   ghost:
-    "text-foreground/90 hover:text-foreground hover:bg-white/5",
+    "text-foreground/80 hover:text-foreground hover:bg-brand/6",
   outline:
-    "border border-white/15 text-foreground hover:border-brand-light hover:text-white hover:bg-white/5",
+    "border border-brand/25 text-brand hover:border-brand hover:bg-brand/6",
 };
 
 const buttonSizes: Record<ButtonSize, string> = {
@@ -84,7 +84,7 @@ export function SectionHeading({
     >
       {eyebrow && (
         <div className={cn("mb-4 flex", align === "center" ? "justify-center" : "justify-start")}>
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.18em] text-brand-light">
+          <span className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
             <span className="size-1.5 rounded-full bg-gold animate-pulse" />
             {eyebrow}
           </span>

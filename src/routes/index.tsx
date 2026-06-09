@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HeroSection, ScholarshipBanner, WhyYETP, CoursesSection, FoundersSection, MissionVisionSection, TestimonialsSection, PartnersSection, CTASection } from "@/components/yetp/sections";
+import { HeroSection, ScholarshipBanner, CoursesSection, WhyYETP, MissionVisionSection, TestimonialsSection, PartnersSection, CTASection } from "@/components/yetp/sections";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,10 +20,9 @@ function Home() {
     <>
       <HeroSection />
       <ScholarshipBanner />
-      <WhyYETP />
       <CoursesSection />
+      <WhyYETP />
       <MissionVisionSection />
-      <FoundersSection />
       <TestimonialsSection />
       <PartnersSection />
       <CTASection />

@@ -19,8 +19,8 @@ export const courses: Course[] = [
     slug: "full-stack-digital-marketing",
     title: "Full Stack Digital Marketing",
     icon: FaBullhorn,
-    duration: "3 Months + 1-Month Internship",
-    description: "Planned with a 1-Month internship for entire trainees by industrial & Marketing Experts with maximum experience in the Digital Marketing field. 100% Hands-On Training included with Labs.",
+    duration: "3 Months + 1 Month Internship",
+    description: "Planned with a 1-Month internship by industrial & Marketing Experts. 100% Hands-On Training with Labs covering SEO, SEM, social media, content and paid media.",
     outcomes: ["Performance Marketer", "Growth Lead", "SEO Specialist"],
     internship: true,
   },
@@ -28,8 +28,8 @@ export const courses: Course[] = [
     slug: "premium-graphic-designing",
     title: "Premium Graphic Designing",
     icon: FaPalette,
-    duration: "3 Months + 1-Month Internship",
-    description: "Premium Creative Designing program by industrial Experts with maximum experience in the Creative Designing field. 100% Hands-On Training included with Labs.",
+    duration: "3 Months + 1 Month Internship",
+    description: "Creative Designing training by industrial Experts. Brand identity, typography, layout — built in Figma, Illustrator & After Effects. 100% Hands-On with Labs.",
     outcomes: ["Brand Designer", "Visual Designer", "Freelance Creative"],
     internship: true,
   },
@@ -38,7 +38,7 @@ export const courses: Course[] = [
     title: "Shopify & Daraz",
     icon: FaShoppingCart,
     duration: "3 Months",
-    description: "Daraz & Shopify Program by industrial VA Experts with maximum experience in the freelancing field. Practical, hands-on learning environment.",
+    description: "Complete Daraz & Shopify Program by VA Experts. Product research, listings, ads, operations — practical hands-on learning environment.",
     outcomes: ["Ecom Manager", "Store Owner", "Daraz Seller"],
     internship: true,
   },
@@ -47,7 +47,7 @@ export const courses: Course[] = [
     title: "Amazon VA",
     icon: FaAmazon,
     duration: "3 Months",
-    description: "Amazon Virtual Assistant Program by industrial VA Experts with maximum experience in the freelancing field. Practical, hands-on learning environment.",
+    description: "Amazon Virtual Assistant Program by VA Experts with maximum experience in freelancing. PL, wholesale, FBA and account management — practical environment.",
     outcomes: ["Amazon VA", "FBA Specialist", "Account Manager"],
     internship: true,
   },
@@ -55,8 +55,8 @@ export const courses: Course[] = [
     slug: "ui-ux-designing",
     title: "UI/UX Designing",
     icon: FaPaintBrush,
-    duration: "2 Months + 1-Month Internship",
-    description: "UI/UX Designing program by industrial & Software House Experts with maximum experience in the Creative Designing field. 100% Hands-On Training included with Labs.",
+    duration: "2 Months + 1 Month Internship",
+    description: "UIUX Designing program by Software Houses & industrial Experts. Research, wireframes, prototyping and design systems — portfolio-grade product work.",
     outcomes: ["Product Designer", "UX Researcher", "Design Systems"],
     internship: true,
   },
@@ -65,54 +65,79 @@ export const courses: Course[] = [
     title: "React & Node JS",
     icon: FaReact,
     duration: "3 Months",
-    description: "Web Development program by Software House & industrial Experts with maximum experience in the Web Development field. Practical, hands-on learning.",
+    description: "Web Development program by Software Houses & industrial Experts. Full-stack JavaScript — React, Node, APIs, databases and deployment to production.",
     outcomes: ["Full-Stack Dev", "Frontend Engineer", "API Engineer"],
     internship: true,
   },
 ];
 
 export const stats = [
-  { value: "3+", label: "Years of Excellence" },
-  { value: "6", label: "Premium Courses" },
-  { value: "Rs.100K", label: "Scholarship" },
-  { value: "1M", label: "Youth Training Goal" },
+  { value: "9,288+", label: "Enrolled Students" },
+  { value: "5,326+", label: "No. of Alumni" },
+  { value: "26+", label: "Available Courses" },
+  { value: "30+", label: "Available Trainers" },
   { value: "#1", label: "IT Institute in Pakistan" },
 ];
 
 export const features = [
-  { icon: FaIndustry, title: "Industrial Experts", desc: "Trainers from real industry — not classroom-only academics." },
-  { icon: FaLaptopCode, title: "100% Hands-On Training", desc: "Build real projects from week one. No passive lectures." },
-  { icon: FaMoneyBillWave, title: "Minimal Fee Structure", desc: "World-class curriculum at a fraction of the market rate." },
-  { icon: FaRocket, title: "Internship Opportunities", desc: "Guaranteed internships with partner companies and agencies." },
-  { icon: FaGlobeAmericas, title: "Global Job Readiness", desc: "Portfolio, English fluency and freelancing for global gigs." },
-  { icon: FaHandHoldingHeart, title: "Non-Profit Organization", desc: "Mission-first. Every rupee fuels youth empowerment." },
+  { icon: FaIndustry, title: "Industrial Experts", desc: "Top notch trainers from real industry — not classroom-only academics." },
+  { icon: FaLaptopCode, title: "100% Hands-On Training", desc: "Build real projects from week one. No passive lectures — only practical labs." },
+  { icon: FaMoneyBillWave, title: "Minimal Fee Structure", desc: "World-class curriculum at a fraction of the market rate. Affordable for all." },
+  { icon: FaRocket, title: "Internship Opportunities", desc: "Guaranteed internships with partner companies, agencies and software houses." },
+  { icon: FaGlobeAmericas, title: "Global Job Readiness", desc: "Portfolio, English fluency and freelancing skills for global career pathways." },
+  { icon: FaHandHoldingHeart, title: "Rs.100K Scholarship", desc: "Up to Rs.100,000 scholarship available for deserving youth. Limited seats." },
 ];
 
 export const testimonials = [
-  { name: "Junaid Iqbal", course: "Premium Graphic Designing", rating: 5, quote: "I took the premium graphic design course from YETP. After completing it, YETP offered me an internship — I worked on Lucky Cement Faisalabad, GTA Homes, Stralent Brand Management and YETP's own branding. If you want a strong foundation for a future career in graphic design, YETP is the perfect choice." },
-  { name: "Nayab Mirza", course: "Full Stack Digital Marketing", rating: 5, quote: "YETP is a very good institute for students who want to learn good skills. I'm doing the Digital Marketing course and I'm learning so many things." },
-  { name: "Tahir Ghaffar", course: "Web Design", rating: 5, quote: "I recently completed the web design program at YETP. Instructors were highly knowledgeable and passionate. The curriculum was comprehensive with real-world examples. Facilities were well-equipped and staff was always helpful — I'd highly recommend it." },
-  { name: "Faiza Maryam", course: "Premium Graphic Designing", rating: 5, quote: "I recently joined this institute as a graphic design student. It's the best opportunity to polish your skills. The teaching methodology is great for online and physical students — and the fee is very affordable. Come, learn and earn." },
+  {
+    name: "Junaid Iqbal",
+    course: "Premium Graphic Designing",
+    rating: 5,
+    quote: "After I completed my course, YETP offered me an internship. I had the incredible opportunity to work on projects like Lucky Cement Faisalabad, GTA Homes, Stralent Brand Management. YETP is the perfect choice for a future career in graphic design.",
+  },
+  {
+    name: "Nayab Mirza",
+    course: "Full Stack Digital Marketing",
+    rating: 5,
+    quote: "YETP is very good Institute for those students who want to learn good skills. I'm doing Digital Marketing Course and I learn so many things. Highly recommended!",
+  },
+  {
+    name: "Tahir Ghaffar",
+    course: "Full Stack Digital Marketing",
+    rating: 5,
+    quote: "The instructors were highly knowledgeable and passionate. The curriculum was comprehensive with real-world examples. The facilities were well-equipped and the staff was always helpful. A very positive experience.",
+  },
+  {
+    name: "Faiza Maryam",
+    course: "Premium Graphic Designing",
+    rating: 5,
+    quote: "It's the best opportunity to polish your skill. Teaching methodology is good for both online and physical students. They charge very low price and gave opportunity to start your own work. Best part — come and join fast!",
+  },
 ];
 
 export const founders = [
-  { name: "Engr. Waqar Rao", role: "Founder & CEO, YETP", bio: "Leading YETP's mission to empower Pakistan's youth through industry-grade training and entrepreneurship." },
-  { name: "Engr. Umair Iftikhar", role: "Co-Founder & COO, YETP", bio: "Driving operations, curriculum and nationwide internship partnerships at YETP." },
-];
-
-export const partners = [
-  { name: "Lucky Cement", logo: "https://yetp.pk/wp-content/uploads/2024/05/Lucky-cement.jpg" },
-  { name: "Techbuzz", logo: "https://yetp.pk/wp-content/uploads/2024/05/Techbuzz.jpg" },
-  { name: "Locatio99", logo: "https://yetp.pk/wp-content/uploads/2024/05/Locatio99.jpg" },
-  { name: "Stralent", logo: "https://yetp.pk/wp-content/uploads/2024/05/Stralent-update.jpg" },
-  { name: "Sublime", logo: "https://yetp.pk/wp-content/uploads/2024/05/Sublime-update.jpg" },
-  { name: "XpertPrime", logo: "https://yetp.pk/wp-content/uploads/2024/05/XpertPrime-update.jpg" },
-  { name: "GTA Homes", logo: "https://yetp.pk/wp-content/uploads/2024/05/GTA.jpg" },
+  {
+    name: "Engr. Waqar Rao",
+    role: "Founder & CEO, YETP",
+    bio: "Engineer-turned-educator on a mission to industrialize Pakistan's youth talent pipeline. Leading YETP's vision to train 1 million youth in emerging technologies.",
+  },
+  {
+    name: "Engr. Umair Iftikhar",
+    role: "Co-Founder & COO, YETP",
+    bio: "Operator behind YETP's curriculum, mentorship and internship partnerships nationwide. Driving excellence across all training programs and industry collaborations.",
+  },
 ];
 
 export const pillars = [
-  { title: "Skills Development", desc: "Industry-grade, hands-on curriculum." },
-  { title: "Equal Opportunities", desc: "Talent first. Background second." },
-  { title: "Scholarships", desc: "Up to Rs.100,000 per deserving student." },
-  { title: "6-Figure Careers", desc: "Local jobs, remote roles and freelancing." },
+  { title: "Skills Development", desc: "Industry-grade, hands-on curriculum for emerging technologies." },
+  { title: "Equal Opportunities", desc: "Talent first. Internships and jobs to the best trainees." },
+  { title: "Rs.100K Scholarships", desc: "Up to Rs.100,000 per deserving student — no one left behind." },
+  { title: "4.0 Industrial Revolution", desc: "Training youth in technologies that shape Pakistan's future." },
+];
+
+export const partners = [
+  { name: "Sublime", abbr: "SB" },
+  { name: "XpertPrime", abbr: "XP" },
+  { name: "GTA Homes", abbr: "GTA" },
+  { name: "Lucky Cement", abbr: "LC" },
 ];
