@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ReactNode, ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 
@@ -75,12 +74,7 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className={cn("max-w-3xl", align === "center" ? "mx-auto text-center" : "text-left", className)}
-    >
+    <div className={cn("max-w-3xl", align === "center" ? "mx-auto text-center" : "text-left", className)}>
       {eyebrow && (
         <div className={cn("mb-4 flex", align === "center" ? "justify-center" : "justify-start")}>
           <span className="inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand">
@@ -91,27 +85,21 @@ export function SectionHeading({
       )}
       <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.05]">{title}</h2>
       {description && <p className="mt-4 text-base sm:text-lg text-muted-foreground">{description}</p>}
-    </motion.div>
+    </div>
   );
 }
 
 export function FadeIn({
   children,
-  delay = 0,
-  y = 24,
   className,
+  delay: _delay,
+  y: _y,
   ...rest
-}: { children: ReactNode; delay?: number; y?: number; className?: string } & HTMLMotionProps<"div">) {
+}: { children: ReactNode; delay?: number; y?: number; className?: string; [key: string]: unknown }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay, ease: "easeOut" }}
-      className={className}
-      {...rest}
-    >
+    <div className={className} {...(rest as object)}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
