@@ -80,7 +80,7 @@ function RootShell({ children }: { children: ReactNode }) {
 function RouteTransition({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={pathname}
         initial={{ opacity: 0, y: 12 }}
