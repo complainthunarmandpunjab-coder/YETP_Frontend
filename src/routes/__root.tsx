@@ -1,8 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet, Link, createRootRouteWithContext, useRouter, HeadContent, Scripts } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { useRouterState } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { Navbar } from "@/components/yetp/Navbar";
@@ -77,32 +75,13 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
-function RouteTransition({ children }: { children: ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.35, ease: "easeOut" }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
       <Navbar />
       <main className="min-h-screen">
-        <RouteTransition>
-          <Outlet />
-        </RouteTransition>
+        <Outlet />
       </main>
       <Footer />
     </QueryClientProvider>
