@@ -55,9 +55,9 @@ function CourseDetailPage() {
   const [openModule, setOpenModule] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ paddingTop: 100 }}>
 
-      {/* ── BREADCRUMB BAR — light background so it's visible below the green navbar ── */}
+      {/* ── BREADCRUMB BAR ── */}
       <div style={{ background: "#f0f6f2", borderBottom: "1px solid #c8dfd0" }}>
         <Container>
           <div className="flex h-11 items-center justify-between">
