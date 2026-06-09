@@ -27,6 +27,7 @@ import { Route as CandidateLoginRouteImport } from './routes/candidate-login'
 import { Route as ApplyPhysicalRouteImport } from './routes/apply-physical'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -118,6 +119,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesSlugRoute = CoursesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CoursesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,7 +133,7 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
+  '/courses': typeof CoursesRouteWithChildren
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
+  '/courses/$slug': typeof CoursesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,7 +154,7 @@ export interface FileRoutesByTo {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
+  '/courses': typeof CoursesRouteWithChildren
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
+  '/courses/$slug': typeof CoursesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -168,7 +176,7 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRoute
+  '/courses': typeof CoursesRouteWithChildren
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
+  '/courses/$slug': typeof CoursesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
+    | '/courses/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
+    | '/courses/$slug'
   id:
     | '__root__'
     | '/'
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
+    | '/courses/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,7 +263,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   CertificateVerificationRoute: typeof CertificateVerificationRoute
   ContactRoute: typeof ContactRoute
-  CoursesRoute: typeof CoursesRoute
+  CoursesRoute: typeof CoursesRouteWithChildren
   EnrollRoute: typeof EnrollRoute
   EventsRoute: typeof EventsRoute
   FaqsRoute: typeof FaqsRoute
@@ -392,8 +404,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses/$slug': {
+      id: '/courses/$slug'
+      path: '/$slug'
+      fullPath: '/courses/$slug'
+      preLoaderRoute: typeof CoursesSlugRouteImport
+      parentRoute: typeof CoursesRoute
+    }
   }
 }
+
+interface CoursesRouteChildren {
+  CoursesSlugRoute: typeof CoursesSlugRoute
+}
+
+const CoursesRouteChildren: CoursesRouteChildren = {
+  CoursesSlugRoute: CoursesSlugRoute,
+}
+
+const CoursesRouteWithChildren =
+  CoursesRoute._addFileChildren(CoursesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -403,7 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   CertificateVerificationRoute: CertificateVerificationRoute,
   ContactRoute: ContactRoute,
-  CoursesRoute: CoursesRoute,
+  CoursesRoute: CoursesRouteWithChildren,
   EnrollRoute: EnrollRoute,
   EventsRoute: EventsRoute,
   FaqsRoute: FaqsRoute,

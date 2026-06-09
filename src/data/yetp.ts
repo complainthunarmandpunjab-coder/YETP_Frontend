@@ -4,6 +4,11 @@ import {
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
+export type CourseModule = {
+  title: string;
+  topics: string[];
+};
+
 export type Course = {
   slug: string;
   title: string;
@@ -12,6 +17,11 @@ export type Course = {
   description: string;
   outcomes: string[];
   internship: boolean;
+  level: string;
+  category: string;
+  whatYouLearn: string[];
+  modules: CourseModule[];
+  fee: string;
 };
 
 export const courses: Course[] = [
@@ -23,6 +33,39 @@ export const courses: Course[] = [
     description: "Planned with a 1-Month internship by industrial & Marketing Experts. 100% Hands-On Training with Labs covering SEO, SEM, social media, content and paid media.",
     outcomes: ["Performance Marketer", "Growth Lead", "SEO Specialist"],
     internship: true,
+    level: "Beginner to Advanced",
+    category: "Digital Marketing",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Master SEO and rank websites on Google",
+      "Run profitable Google Search & Display Ads",
+      "Manage Facebook, Instagram and TikTok campaigns",
+      "Create high-converting content strategies",
+      "Build and grow email marketing funnels",
+      "Analyze performance with Google Analytics & Meta Pixel",
+    ],
+    modules: [
+      {
+        title: "Module 1: SEO Fundamentals",
+        topics: ["Keyword Research", "On-Page SEO", "Off-Page & Link Building", "Technical SEO", "Local SEO"],
+      },
+      {
+        title: "Module 2: Google Ads (SEM)",
+        topics: ["Search Campaigns", "Display Advertising", "Shopping Ads", "Remarketing", "Conversion Tracking"],
+      },
+      {
+        title: "Module 3: Social Media Marketing",
+        topics: ["Facebook Ads Manager", "Instagram Promotions", "TikTok Ads", "LinkedIn Marketing", "Content Calendar"],
+      },
+      {
+        title: "Module 4: Content & Email Marketing",
+        topics: ["Copywriting for Web", "Blog & Video Strategy", "Email Automation", "Lead Magnet Design", "CRM Basics"],
+      },
+      {
+        title: "Module 5: Analytics & Reporting",
+        topics: ["Google Analytics 4", "Meta Pixel Setup", "KPI Dashboards", "A/B Testing", "Campaign Reporting"],
+      },
+    ],
   },
   {
     slug: "premium-graphic-designing",
@@ -32,6 +75,39 @@ export const courses: Course[] = [
     description: "Creative Designing training by industrial Experts. Brand identity, typography, layout — built in Figma, Illustrator & After Effects. 100% Hands-On with Labs.",
     outcomes: ["Brand Designer", "Visual Designer", "Freelance Creative"],
     internship: true,
+    level: "Beginner",
+    category: "Design & Creativity",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Design logos and complete brand identity systems",
+      "Master typography, color theory and layout",
+      "Create print and digital media designs",
+      "Build animated motion graphics in After Effects",
+      "Design UI mockups in Figma",
+      "Build a professional portfolio for freelancing",
+    ],
+    modules: [
+      {
+        title: "Module 1: Adobe Photoshop",
+        topics: ["Photo Editing & Retouching", "Compositing", "Social Media Graphics", "Poster Design", "Mockups"],
+      },
+      {
+        title: "Module 2: Adobe Illustrator",
+        topics: ["Logo Design", "Vector Illustration", "Typography", "Branding Kits", "Print Materials"],
+      },
+      {
+        title: "Module 3: Figma for UI Design",
+        topics: ["Components & Auto Layout", "Prototyping", "Design Systems", "Handoff to Developers"],
+      },
+      {
+        title: "Module 4: After Effects",
+        topics: ["Motion Graphics Basics", "Text Animations", "Logo Animation", "Video Intros & Outros"],
+      },
+      {
+        title: "Module 5: Freelancing & Portfolio",
+        topics: ["Behance & Dribbble Setup", "Fiverr Profile Optimization", "Client Communication", "Pricing Your Work"],
+      },
+    ],
   },
   {
     slug: "shopify-daraz",
@@ -41,6 +117,39 @@ export const courses: Course[] = [
     description: "Complete Daraz & Shopify Program by VA Experts. Product research, listings, ads, operations — practical hands-on learning environment.",
     outcomes: ["Ecom Manager", "Store Owner", "Daraz Seller"],
     internship: true,
+    level: "Beginner",
+    category: "E-Commerce",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Set up and manage a Daraz seller account",
+      "Build a Shopify store from scratch",
+      "Conduct product research using analytics tools",
+      "Optimize listings for search visibility",
+      "Run Daraz Sponsored & Shopify ads profitably",
+      "Manage orders, returns and customer service",
+    ],
+    modules: [
+      {
+        title: "Module 1: Daraz Seller Fundamentals",
+        topics: ["Account Registration", "Product Listing", "Pricing Strategy", "Daraz University", "Seller Center"],
+      },
+      {
+        title: "Module 2: Shopify Store Setup",
+        topics: ["Theme Customization", "Product Pages", "Payment Gateways", "Shipping Settings", "Apps & Plugins"],
+      },
+      {
+        title: "Module 3: Product Research",
+        topics: ["Niche Selection", "Competitor Analysis", "Trending Products", "Supplier Sourcing", "Profit Margins"],
+      },
+      {
+        title: "Module 4: Advertising",
+        topics: ["Daraz Sponsored Ads", "Shopify Facebook Ads", "Retargeting", "Ad Analytics", "ROI Optimization"],
+      },
+      {
+        title: "Module 5: Operations & Scaling",
+        topics: ["Order Fulfillment", "Returns Management", "Customer Reviews", "Inventory Planning", "Scaling Strategy"],
+      },
+    ],
   },
   {
     slug: "amazon-va",
@@ -50,6 +159,39 @@ export const courses: Course[] = [
     description: "Amazon Virtual Assistant Program by VA Experts with maximum experience in freelancing. PL, wholesale, FBA and account management — practical environment.",
     outcomes: ["Amazon VA", "FBA Specialist", "Account Manager"],
     internship: true,
+    level: "Beginner to Intermediate",
+    category: "Freelancing & E-Commerce",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Navigate Amazon Seller Central confidently",
+      "Conduct product research using Helium10 & Jungle Scout",
+      "Create optimized listings with A+ content",
+      "Manage PPC campaigns for profitability",
+      "Source products through wholesale and private label",
+      "Handle account health and customer metrics",
+    ],
+    modules: [
+      {
+        title: "Module 1: Amazon Marketplace Basics",
+        topics: ["Seller Central Walkthrough", "FBA vs FBM", "Account Setup", "Categories & Restrictions", "Buy Box"],
+      },
+      {
+        title: "Module 2: Product Research",
+        topics: ["Helium10 & Jungle Scout", "Niche Validation", "Competition Analysis", "Profitability Calculator"],
+      },
+      {
+        title: "Module 3: Listing Optimization",
+        topics: ["Keyword Research", "Title & Bullets", "A+ Content", "Images & Infographics", "Backend Keywords"],
+      },
+      {
+        title: "Module 4: Amazon PPC",
+        topics: ["Sponsored Products", "Sponsored Brands", "Auto vs Manual Campaigns", "Bid Optimization", "ACoS"],
+      },
+      {
+        title: "Module 5: Wholesale & Private Label",
+        topics: ["Supplier Sourcing", "Alibaba & Local Suppliers", "MOQ & Negotiations", "Shipping to Amazon FBA"],
+      },
+    ],
   },
   {
     slug: "ui-ux-designing",
@@ -59,6 +201,39 @@ export const courses: Course[] = [
     description: "UIUX Designing program by Software Houses & industrial Experts. Research, wireframes, prototyping and design systems — portfolio-grade product work.",
     outcomes: ["Product Designer", "UX Researcher", "Design Systems"],
     internship: true,
+    level: "Beginner",
+    category: "Design & Technology",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Apply design thinking and user-centered research",
+      "Create wireframes and interactive prototypes in Figma",
+      "Build scalable design systems and component libraries",
+      "Conduct usability testing and iterate designs",
+      "Present and document your design decisions",
+      "Build a portfolio that impresses employers",
+    ],
+    modules: [
+      {
+        title: "Module 1: UX Research & Design Thinking",
+        topics: ["User Interviews", "Personas & Journey Maps", "Problem Definition", "Ideation Techniques"],
+      },
+      {
+        title: "Module 2: Figma Fundamentals",
+        topics: ["Frames & Grids", "Components & Variants", "Auto Layout", "Styles & Variables"],
+      },
+      {
+        title: "Module 3: Wireframing & Prototyping",
+        topics: ["Low-Fi Wireframes", "High-Fi Mockups", "Interactive Prototypes", "Micro Interactions"],
+      },
+      {
+        title: "Module 4: Design Systems",
+        topics: ["Atomic Design", "Color & Typography Systems", "Icon Libraries", "Documentation"],
+      },
+      {
+        title: "Module 5: Portfolio & Career",
+        topics: ["Case Study Writing", "Behance Portfolio", "LinkedIn Optimization", "Interview Preparation"],
+      },
+    ],
   },
   {
     slug: "react-node-js",
@@ -68,6 +243,39 @@ export const courses: Course[] = [
     description: "Web Development program by Software Houses & industrial Experts. Full-stack JavaScript — React, Node, APIs, databases and deployment to production.",
     outcomes: ["Full-Stack Dev", "Frontend Engineer", "API Engineer"],
     internship: true,
+    level: "Intermediate",
+    category: "Web Development",
+    fee: "Ask for Fee",
+    whatYouLearn: [
+      "Build modern, responsive UIs with React.js",
+      "Develop RESTful APIs using Node.js & Express",
+      "Work with MongoDB and relational databases",
+      "Implement authentication with JWT & OAuth",
+      "Deploy full-stack applications to cloud platforms",
+      "Follow professional Git workflows used in industry",
+    ],
+    modules: [
+      {
+        title: "Module 1: HTML, CSS & JavaScript ES6+",
+        topics: ["Semantic HTML", "Flexbox & Grid", "ES6 Arrow Functions", "Async/Await & Promises", "DOM Manipulation"],
+      },
+      {
+        title: "Module 2: React.js",
+        topics: ["Components & Props", "useState & useEffect", "React Router", "Context API", "Custom Hooks"],
+      },
+      {
+        title: "Module 3: Node.js & Express",
+        topics: ["Node Fundamentals", "REST API Design", "Middleware", "File Upload", "Error Handling"],
+      },
+      {
+        title: "Module 4: MongoDB & Databases",
+        topics: ["MongoDB CRUD", "Mongoose ODM", "Aggregation Pipeline", "Indexing", "SQL Basics"],
+      },
+      {
+        title: "Module 5: Deployment & DevOps Basics",
+        topics: ["Git & GitHub", "Vercel & Render Deploy", "Environment Variables", "CI/CD Basics", "Final Project"],
+      },
+    ],
   },
 ];
 

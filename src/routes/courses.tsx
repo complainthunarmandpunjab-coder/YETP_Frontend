@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Container, FadeIn } from "@/components/yetp/primitives";
 import { PageHero } from "@/components/yetp/PageHero";
 import { courses } from "@/data/yetp";
-import { FiCheck, FiArrowRight, FiClock } from "react-icons/fi";
+import { FiCheck, FiArrowRight, FiClock, FiBookOpen } from "react-icons/fi";
 
 export const Route = createFileRoute("/courses")({
   head: () => ({
@@ -81,17 +81,27 @@ function CoursesPage() {
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-auto flex gap-2 pt-5">
-                      <a href="/enroll"
-                        className="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
-                        style={{ background: "#0B5D3B" }}>
-                        Apply Now
-                      </a>
-                      <a href="/contact"
-                        className="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-[#0B5D3B] transition-all hover:bg-[#0B5D3B] hover:text-white"
-                        style={{ border: "2px solid #0B5D3B" }}>
-                        Enquire
-                      </a>
+                    <div className="mt-auto flex flex-col gap-2 pt-5">
+                      <Link
+                        to="/courses/$slug"
+                        params={{ slug: c.slug }}
+                        className="flex items-center justify-center gap-2 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
+                        style={{ background: "#0B5D3B" }}
+                      >
+                        <FiBookOpen className="size-3.5" /> View Details
+                      </Link>
+                      <div className="flex gap-2">
+                        <a href="/enroll"
+                          className="flex-1 py-2 text-center text-xs font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
+                          style={{ background: "#C9A227" }}>
+                          Apply Now
+                        </a>
+                        <a href="/contact"
+                          className="flex-1 py-2 text-center text-xs font-bold uppercase tracking-wide text-[#0B5D3B] transition-all hover:bg-[#0B5D3B] hover:text-white"
+                          style={{ border: "2px solid #0B5D3B" }}>
+                          Enquire
+                        </a>
+                      </div>
                     </div>
                   </div>
                 </article>
