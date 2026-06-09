@@ -57,20 +57,20 @@ function CourseDetailPage() {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* ── NAV BAR ── */}
-      <div style={{ background: "#0B5D3B", borderBottom: "3px solid #C9A227" }}>
+      {/* ── BREADCRUMB BAR — light background so it's visible below the green navbar ── */}
+      <div style={{ background: "#f0f6f2", borderBottom: "1px solid #c8dfd0" }}>
         <Container>
-          <div className="flex h-12 items-center justify-between">
+          <div className="flex h-11 items-center justify-between">
             <Link
               to="/courses"
-              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10"
-              style={{ borderColor: "rgba(255,255,255,0.3)" }}
+              className="inline-flex items-center gap-2 text-xs font-bold transition-colors hover:underline"
+              style={{ color: "#0B5D3B" }}
             >
               <FiArrowLeft className="size-3.5" /> Back to Courses
             </Link>
             <span
               className="rounded-sm px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest"
-              style={{ background: "#C9A227", color: "#073d27" }}
+              style={{ background: "#0B5D3B", color: "#fff" }}
             >
               {course.level}
             </span>
