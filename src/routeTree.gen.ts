@@ -27,7 +27,7 @@ import { Route as CandidateLoginRouteImport } from './routes/candidate-login'
 import { Route as ApplyPhysicalRouteImport } from './routes/apply-physical'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as CoursesSlugRouteImport } from './routes/courses_.$slug'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -120,9 +120,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesSlugRoute = CoursesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => CoursesRoute,
+  id: '/courses_/$slug',
+  path: '/courses/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -133,7 +133,7 @@ export interface FileRoutesByFullPath {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRouteWithChildren
+  '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -154,7 +154,7 @@ export interface FileRoutesByTo {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRouteWithChildren
+  '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -176,7 +176,7 @@ export interface FileRoutesById {
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
-  '/courses': typeof CoursesRouteWithChildren
+  '/courses': typeof CoursesRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -187,7 +187,7 @@ export interface FileRoutesById {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
-  '/courses/$slug': typeof CoursesSlugRoute
+  '/courses_/$slug': typeof CoursesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -252,7 +252,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
-    | '/courses/$slug'
+    | '/courses_/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -263,7 +263,7 @@ export interface RootRouteChildren {
   CareersRoute: typeof CareersRoute
   CertificateVerificationRoute: typeof CertificateVerificationRoute
   ContactRoute: typeof ContactRoute
-  CoursesRoute: typeof CoursesRouteWithChildren
+  CoursesRoute: typeof CoursesRoute
   EnrollRoute: typeof EnrollRoute
   EventsRoute: typeof EventsRoute
   FaqsRoute: typeof FaqsRoute
@@ -274,6 +274,7 @@ export interface RootRouteChildren {
   SuccessStoryRoute: typeof SuccessStoryRoute
   TeamRoute: typeof TeamRoute
   TermsRoute: typeof TermsRoute
+  CoursesSlugRoute: typeof CoursesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -404,26 +405,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/courses/$slug': {
-      id: '/courses/$slug'
-      path: '/$slug'
+    '/courses_/$slug': {
+      id: '/courses_/$slug'
+      path: '/courses/$slug'
       fullPath: '/courses/$slug'
       preLoaderRoute: typeof CoursesSlugRouteImport
-      parentRoute: typeof CoursesRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface CoursesRouteChildren {
-  CoursesSlugRoute: typeof CoursesSlugRoute
-}
-
-const CoursesRouteChildren: CoursesRouteChildren = {
-  CoursesSlugRoute: CoursesSlugRoute,
-}
-
-const CoursesRouteWithChildren =
-  CoursesRoute._addFileChildren(CoursesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -433,7 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   CareersRoute: CareersRoute,
   CertificateVerificationRoute: CertificateVerificationRoute,
   ContactRoute: ContactRoute,
-  CoursesRoute: CoursesRouteWithChildren,
+  CoursesRoute: CoursesRoute,
   EnrollRoute: EnrollRoute,
   EventsRoute: EventsRoute,
   FaqsRoute: FaqsRoute,
@@ -444,6 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuccessStoryRoute: SuccessStoryRoute,
   TeamRoute: TeamRoute,
   TermsRoute: TermsRoute,
+  CoursesSlugRoute: CoursesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

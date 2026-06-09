@@ -4,7 +4,7 @@ import { Container } from "@/components/yetp/primitives";
 import { FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp, FiTag, FiAward } from "react-icons/fi";
 import { useState } from "react";
 
-export const Route = createFileRoute("/courses/$slug")({
+export const Route = createFileRoute("/courses_/$slug")({
   loader: ({ params }) => {
     const course = courses.find((c) => c.slug === params.slug);
     if (!course) throw notFound();
