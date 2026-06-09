@@ -3,6 +3,6 @@
   "outputDirectory": "dist/client",
   "framework": null,
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/ssr" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
