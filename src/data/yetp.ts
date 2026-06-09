@@ -21,6 +21,8 @@ export type Course = {
   category: string;
   whatYouLearn: string[];
   modules: CourseModule[];
+  prerequisites: string[];
+  tools: string[];
   fee: string;
 };
 
@@ -30,7 +32,8 @@ export const courses: Course[] = [
     title: "Full Stack Digital Marketing",
     icon: FaBullhorn,
     duration: "3 Months + 1 Month Internship",
-    description: "Planned with a 1-Month internship by industrial & Marketing Experts. 100% Hands-On Training with Labs covering SEO, SEM, social media, content and paid media.",
+    description:
+      "Planned with a 1-Month internship by industrial & Marketing Experts. 100% Hands-On Training with Labs covering SEO, SEM, social media, content and paid media.",
     outcomes: ["Performance Marketer", "Growth Lead", "SEO Specialist"],
     internship: true,
     level: "Beginner to Advanced",
@@ -40,9 +43,23 @@ export const courses: Course[] = [
       "Master SEO and rank websites on Google",
       "Run profitable Google Search & Display Ads",
       "Manage Facebook, Instagram and TikTok campaigns",
-      "Create high-converting content strategies",
-      "Build and grow email marketing funnels",
-      "Analyze performance with Google Analytics & Meta Pixel",
+      "Build high-converting content strategies",
+      "Set up and grow email marketing funnels",
+      "Analyze campaigns with Google Analytics & Meta Pixel",
+    ],
+    prerequisites: [
+      "Basic computer and internet skills",
+      "Interest in marketing and business",
+      "No prior marketing experience required",
+    ],
+    tools: [
+      "Google Analytics 4",
+      "Meta Ads Manager",
+      "SEMrush / Ahrefs",
+      "Canva",
+      "Mailchimp",
+      "WordPress",
+      "Google Search Console",
     ],
     modules: [
       {
@@ -72,7 +89,8 @@ export const courses: Course[] = [
     title: "Premium Graphic Designing",
     icon: FaPalette,
     duration: "3 Months + 1 Month Internship",
-    description: "Creative Designing training by industrial Experts. Brand identity, typography, layout — built in Figma, Illustrator & After Effects. 100% Hands-On with Labs.",
+    description:
+      "Creative Designing training by industrial Experts. Brand identity, typography, layout — built in Figma, Illustrator & After Effects. 100% Hands-On with Labs.",
     outcomes: ["Brand Designer", "Visual Designer", "Freelance Creative"],
     internship: true,
     level: "Beginner",
@@ -80,24 +98,37 @@ export const courses: Course[] = [
     fee: "Ask for Fee",
     whatYouLearn: [
       "Design logos and complete brand identity systems",
-      "Master typography, color theory and layout",
+      "Master typography, color theory and layout principles",
       "Create print and digital media designs",
       "Build animated motion graphics in After Effects",
-      "Design UI mockups in Figma",
-      "Build a professional portfolio for freelancing",
+      "Design UI mockups and prototypes in Figma",
+      "Build a professional freelancing portfolio",
+    ],
+    prerequisites: [
+      "Basic computer literacy",
+      "Creative mindset and interest in visual design",
+      "No prior design experience needed",
+    ],
+    tools: [
+      "Adobe Photoshop",
+      "Adobe Illustrator",
+      "Adobe After Effects",
+      "Figma",
+      "Canva Pro",
+      "Behance (portfolio)",
     ],
     modules: [
       {
         title: "Module 1: Adobe Photoshop",
-        topics: ["Photo Editing & Retouching", "Compositing", "Social Media Graphics", "Poster Design", "Mockups"],
+        topics: ["Photo Editing & Retouching", "Compositing & Masking", "Social Media Graphics", "Poster Design", "Mockups"],
       },
       {
         title: "Module 2: Adobe Illustrator",
-        topics: ["Logo Design", "Vector Illustration", "Typography", "Branding Kits", "Print Materials"],
+        topics: ["Logo Design", "Vector Illustration", "Typography Mastery", "Branding Kits", "Print Materials"],
       },
       {
         title: "Module 3: Figma for UI Design",
-        topics: ["Components & Auto Layout", "Prototyping", "Design Systems", "Handoff to Developers"],
+        topics: ["Frames & Auto Layout", "Components & Variants", "Prototyping", "Design Systems", "Developer Handoff"],
       },
       {
         title: "Module 4: After Effects",
@@ -114,7 +145,8 @@ export const courses: Course[] = [
     title: "Shopify & Daraz",
     icon: FaShoppingCart,
     duration: "3 Months",
-    description: "Complete Daraz & Shopify Program by VA Experts. Product research, listings, ads, operations — practical hands-on learning environment.",
+    description:
+      "Complete Daraz & Shopify Program by VA Experts. Product research, listings, ads, operations — practical hands-on learning environment.",
     outcomes: ["Ecom Manager", "Store Owner", "Daraz Seller"],
     internship: true,
     level: "Beginner",
@@ -124,9 +156,22 @@ export const courses: Course[] = [
       "Set up and manage a Daraz seller account",
       "Build a Shopify store from scratch",
       "Conduct product research using analytics tools",
-      "Optimize listings for search visibility",
-      "Run Daraz Sponsored & Shopify ads profitably",
+      "Optimize listings for maximum search visibility",
+      "Run profitable Daraz Sponsored & Shopify ads",
       "Manage orders, returns and customer service",
+    ],
+    prerequisites: [
+      "Basic computer and internet skills",
+      "A smartphone or laptop",
+      "Interest in online business and selling",
+    ],
+    tools: [
+      "Daraz Seller Center",
+      "Shopify",
+      "Meta Ads Manager",
+      "Google Sheets",
+      "Canva (product images)",
+      "Dsers / Oberlo",
     ],
     modules: [
       {
@@ -156,7 +201,8 @@ export const courses: Course[] = [
     title: "Amazon VA",
     icon: FaAmazon,
     duration: "3 Months",
-    description: "Amazon Virtual Assistant Program by VA Experts with maximum experience in freelancing. PL, wholesale, FBA and account management — practical environment.",
+    description:
+      "Amazon Virtual Assistant Program by VA Experts with maximum experience in freelancing. PL, wholesale, FBA and account management — practical environment.",
     outcomes: ["Amazon VA", "FBA Specialist", "Account Manager"],
     internship: true,
     level: "Beginner to Intermediate",
@@ -169,6 +215,19 @@ export const courses: Course[] = [
       "Manage PPC campaigns for profitability",
       "Source products through wholesale and private label",
       "Handle account health and customer metrics",
+    ],
+    prerequisites: [
+      "Basic English reading and writing skills",
+      "Computer literacy and internet access",
+      "Interest in e-commerce and freelancing",
+    ],
+    tools: [
+      "Amazon Seller Central",
+      "Helium10",
+      "Jungle Scout",
+      "Google Sheets",
+      "Canva (product images)",
+      "Alibaba / Local Suppliers",
     ],
     modules: [
       {
@@ -198,7 +257,8 @@ export const courses: Course[] = [
     title: "UI/UX Designing",
     icon: FaPaintBrush,
     duration: "2 Months + 1 Month Internship",
-    description: "UIUX Designing program by Software Houses & industrial Experts. Research, wireframes, prototyping and design systems — portfolio-grade product work.",
+    description:
+      "UIUX Designing program by Software Houses & industrial Experts. Research, wireframes, prototyping and design systems — portfolio-grade product work.",
     outcomes: ["Product Designer", "UX Researcher", "Design Systems"],
     internship: true,
     level: "Beginner",
@@ -208,9 +268,22 @@ export const courses: Course[] = [
       "Apply design thinking and user-centered research",
       "Create wireframes and interactive prototypes in Figma",
       "Build scalable design systems and component libraries",
-      "Conduct usability testing and iterate designs",
-      "Present and document your design decisions",
-      "Build a portfolio that impresses employers",
+      "Conduct usability testing and iterate on feedback",
+      "Present and document design decisions professionally",
+      "Build a portfolio that impresses real employers",
+    ],
+    prerequisites: [
+      "Basic computer skills",
+      "Interest in design and user experience",
+      "No coding or prior design experience required",
+    ],
+    tools: [
+      "Figma",
+      "Adobe XD",
+      "Miro (user research & flows)",
+      "Zeplin (developer handoff)",
+      "Google Forms (user testing)",
+      "Notion (documentation)",
     ],
     modules: [
       {
@@ -240,7 +313,8 @@ export const courses: Course[] = [
     title: "React & Node JS",
     icon: FaReact,
     duration: "3 Months",
-    description: "Web Development program by Software Houses & industrial Experts. Full-stack JavaScript — React, Node, APIs, databases and deployment to production.",
+    description:
+      "Web Development program by Software Houses & industrial Experts. Full-stack JavaScript — React, Node, APIs, databases and deployment to production.",
     outcomes: ["Full-Stack Dev", "Frontend Engineer", "API Engineer"],
     internship: true,
     level: "Intermediate",
@@ -253,6 +327,20 @@ export const courses: Course[] = [
       "Implement authentication with JWT & OAuth",
       "Deploy full-stack applications to cloud platforms",
       "Follow professional Git workflows used in industry",
+    ],
+    prerequisites: [
+      "Basic HTML and CSS knowledge",
+      "Logical thinking and problem-solving interest",
+      "Familiarity with computers and internet",
+    ],
+    tools: [
+      "VS Code",
+      "Node.js & npm",
+      "MongoDB / MongoDB Atlas",
+      "Git & GitHub",
+      "Postman (API testing)",
+      "Vercel / Render (deployment)",
+      "React DevTools",
     ],
     modules: [
       {

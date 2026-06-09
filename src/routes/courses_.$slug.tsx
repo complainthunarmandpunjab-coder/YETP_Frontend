@@ -1,10 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { courses } from "@/data/yetp";
 import { Container } from "@/components/yetp/primitives";
-import {
-  FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp,
-  FiTag, FiAward, FiLayers, FiPhone,
-} from "react-icons/fi";
+import { FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp, FiPhone } from "react-icons/fi";
 import { useState } from "react";
 
 export const Route = createFileRoute("/courses_/$slug")({
@@ -29,262 +26,211 @@ export const Route = createFileRoute("/courses_/$slug")({
   ),
 });
 
+function CheckList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2.5 text-sm" style={{ color: "#444" }}>
+          <FiCheck className="mt-0.5 size-4 shrink-0" style={{ color: "#0B5D3B" }} strokeWidth={3} />
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-5">
+      <h2 className="text-xl font-extrabold font-display" style={{ color: "#073d27" }}>
+        {children}
+      </h2>
+      <div className="mt-1.5 h-0.5 w-12" style={{ background: "#C9A227" }} />
+    </div>
+  );
+}
+
 function CourseDetailPage() {
   const { course } = Route.useLoaderData();
-  const [openModule, setOpenModule] = useState<number | null>(0);
+  const [openModule, setOpenModule] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen" style={{ background: "#f5f7f5" }}>
+    <div className="min-h-screen bg-white">
 
-      {/* ── HERO ── */}
-      <div style={{ background: "#0B5D3B" }}>
-        <Container className="py-8">
-          {/* Back link */}
-          <Link
-            to="/courses"
-            className="inline-flex items-center gap-2 text-xs font-semibold text-white/70 transition-colors hover:text-white mb-6"
-          >
-            <FiArrowLeft className="size-3.5" /> Back to All Courses
-          </Link>
+      {/* ── NAV BAR ── */}
+      <div style={{ background: "#0B5D3B", borderBottom: "3px solid #C9A227" }}>
+        <Container>
+          <div className="flex h-12 items-center justify-between">
+            <Link
+              to="/courses"
+              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10"
+              style={{ borderColor: "rgba(255,255,255,0.3)" }}
+            >
+              <FiArrowLeft className="size-3.5" /> Back to Courses
+            </Link>
+            <span
+              className="rounded-sm px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest"
+              style={{ background: "#C9A227", color: "#073d27" }}
+            >
+              {course.level}
+            </span>
+          </div>
+        </Container>
+      </div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            {/* Left: title + meta */}
-            <div className="flex-1">
-              {/* Tags */}
-              <div className="mb-4 flex flex-wrap items-center gap-2">
+      {/* ── MAIN ── */}
+      <Container className="py-10">
+        <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
+
+          {/* ── LEFT COLUMN ── */}
+          <div>
+
+            {/* Title + description */}
+            <div className="mb-8">
+              {/* Badges */}
+              <div className="mb-3 flex flex-wrap gap-2">
                 <span
-                  className="inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest"
-                  style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.85)" }}
+                  className="rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest"
+                  style={{ background: "#eef7f1", color: "#0B5D3B" }}
                 >
-                  <FiTag className="size-3" /> {course.category}
+                  {course.category}
                 </span>
                 {course.internship && (
                   <span
-                    className="inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest"
-                    style={{ background: "#C9A227", color: "#073d27" }}
+                    className="rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest"
+                    style={{ background: "#fff8e6", color: "#9a7a1a" }}
                   >
-                    <FiAward className="size-3" /> Includes Internship
+                    Includes Internship
                   </span>
                 )}
-                <span
-                  className="inline-flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest"
-                  style={{ background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)" }}
-                >
-                  <FiLayers className="size-3" /> {course.level}
-                </span>
               </div>
 
-              {/* Icon + Title row */}
-              <div className="flex items-center gap-4 mb-3">
-                <div
-                  className="grid size-14 shrink-0 place-items-center rounded-sm text-white"
-                  style={{ background: "rgba(255,255,255,0.13)", border: "1px solid rgba(255,255,255,0.2)" }}
-                >
-                  <course.icon className="size-7" />
-                </div>
-                <h1 className="font-display text-3xl font-extrabold text-white leading-tight sm:text-4xl">
-                  {course.title}
-                </h1>
-              </div>
-
-              <p className="text-sm leading-relaxed text-white/75 max-w-2xl">
+              <h1 className="font-display text-3xl font-extrabold sm:text-4xl" style={{ color: "#073d27" }}>
+                {course.title}
+              </h1>
+              <p className="mt-3 text-base leading-relaxed" style={{ color: "#555" }}>
                 {course.description}
               </p>
-
-              {/* Key stats */}
-              <div className="mt-5 flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <span className="grid size-6 place-items-center rounded-full" style={{ background: "#C9A227" }}>
-                    <FiClock className="size-3 text-white" />
-                  </span>
-                  <span className="font-semibold">{course.duration}</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <span className="grid size-6 place-items-center rounded-full" style={{ background: "#C9A227" }}>
-                    <FiLayers className="size-3 text-white" />
-                  </span>
-                  <span className="font-semibold">{course.modules.length} Modules</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <span className="grid size-6 place-items-center rounded-full" style={{ background: "#C9A227" }}>
-                    <FiCheck className="size-3 text-white" />
-                  </span>
-                  <span className="font-semibold">{course.whatYouLearn.length} Learning Outcomes</span>
-                </div>
+              <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#0B5D3B" }}>
+                <span
+                  className="grid size-5 place-items-center rounded-full"
+                  style={{ background: "#0B5D3B" }}
+                >
+                  <FiClock className="size-3 text-white" />
+                </span>
+                {course.duration}
               </div>
             </div>
-
-            {/* Right: quick enroll card (desktop hero) */}
-            <div
-              className="hidden lg:flex flex-col gap-3 shrink-0 rounded-sm p-5 min-w-[200px]"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
-            >
-              <div className="text-xs font-extrabold uppercase tracking-widest text-white/50">Quick Enroll</div>
-              <Link
-                to="/enroll"
-                className="block py-3 text-center text-sm font-extrabold uppercase tracking-widest transition-opacity hover:opacity-90"
-                style={{ background: "#C9A227", color: "#073d27" }}
-              >
-                Apply Now
-              </Link>
-              <a
-                href="tel:+923029898082"
-                className="flex items-center justify-center gap-2 py-2.5 text-center text-xs font-bold text-white/80 transition-colors hover:text-white"
-                style={{ border: "1px solid rgba(255,255,255,0.2)" }}
-              >
-                <FiPhone className="size-3.5" /> 0302-9898082
-              </a>
-            </div>
-          </div>
-        </Container>
-
-        {/* Gold accent bar */}
-        <div style={{ height: 3, background: "#C9A227" }} />
-      </div>
-
-      {/* ── BODY ── */}
-      <Container className="py-10">
-        <div className="grid gap-8 lg:grid-cols-[1fr_300px]">
-
-          {/* LEFT */}
-          <div className="space-y-8">
 
             {/* What You'll Learn */}
-            <div
-              className="rounded-sm overflow-hidden"
-              style={{ background: "#fff", border: "1px solid #dde8e2" }}
-            >
-              <div
-                className="px-6 py-4 flex items-center gap-3"
-                style={{ borderBottom: "1px solid #dde8e2", background: "#f8fcf9" }}
-              >
-                <div className="h-5 w-1 rounded-full" style={{ background: "#C9A227" }} />
-                <h2 className="font-display text-lg font-extrabold" style={{ color: "#073d27" }}>
-                  What You'll Learn
-                </h2>
-              </div>
-              <div className="grid gap-3 p-6 sm:grid-cols-2">
+            <div className="mb-10">
+              <SectionTitle>What You'll Learn</SectionTitle>
+              <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
                 {course.whatYouLearn.map((item) => (
-                  <div key={item} className="flex items-start gap-3">
+                  <div key={item} className="flex items-start gap-2.5">
                     <span
                       className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full"
                       style={{ background: "#0B5D3B" }}
                     >
                       <FiCheck className="size-3 text-white" strokeWidth={3} />
                     </span>
-                    <span className="text-sm leading-relaxed" style={{ color: "#333" }}>{item}</span>
+                    <span className="text-sm" style={{ color: "#333" }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Course Modules */}
-            <div
-              className="rounded-sm overflow-hidden"
-              style={{ background: "#fff", border: "1px solid #dde8e2" }}
-            >
-              <div
-                className="px-6 py-4 flex items-center gap-3"
-                style={{ borderBottom: "1px solid #dde8e2", background: "#f8fcf9" }}
-              >
-                <div className="h-5 w-1 rounded-full" style={{ background: "#C9A227" }} />
-                <h2 className="font-display text-lg font-extrabold" style={{ color: "#073d27" }}>
-                  Course Modules
-                </h2>
-                <span
-                  className="ml-auto rounded-sm px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-widest"
-                  style={{ background: "#eef7f1", color: "#0B5D3B" }}
-                >
-                  {course.modules.length} Modules
-                </span>
-              </div>
-
-              <div className="divide-y" style={{ borderColor: "#eef0ee" }}>
-                {course.modules.map((mod, idx) => (
-                  <div key={idx}>
-                    <button
-                      onClick={() => setOpenModule(openModule === idx ? null : idx)}
-                      className="flex w-full items-center gap-4 px-6 py-4 text-left transition-colors"
-                      style={{
-                        background: openModule === idx ? "#0B5D3B" : "#fff",
-                      }}
+            <div className="mb-10">
+              <SectionTitle>Course Modules</SectionTitle>
+              <div className="space-y-2">
+                {course.modules.map((mod, idx) => {
+                  const isOpen = openModule === idx;
+                  return (
+                    <div
+                      key={idx}
+                      className="overflow-hidden rounded-sm"
+                      style={{ border: "1px solid #d0e8d8" }}
                     >
-                      <span
-                        className="grid size-7 shrink-0 place-items-center rounded-sm text-xs font-extrabold"
-                        style={{
-                          background: openModule === idx ? "rgba(255,255,255,0.18)" : "#eef7f1",
-                          color: openModule === idx ? "#C9A227" : "#0B5D3B",
-                        }}
+                      <button
+                        onClick={() => setOpenModule(isOpen ? null : idx)}
+                        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors"
+                        style={{ background: isOpen ? "#073d27" : "#f8fcf9" }}
                       >
-                        {idx + 1}
-                      </span>
-                      <span
-                        className="flex-1 text-sm font-bold"
-                        style={{ color: openModule === idx ? "#fff" : "#073d27" }}
-                      >
-                        {mod.title.replace(/^Module \d+: /, "")}
-                      </span>
-                      <span style={{ color: openModule === idx ? "#C9A227" : "#0B5D3B" }}>
-                        {openModule === idx
-                          ? <FiChevronUp className="size-4" />
-                          : <FiChevronDown className="size-4" />}
-                      </span>
-                    </button>
+                        <span
+                          className="shrink-0 text-[10px] font-extrabold uppercase tracking-widest"
+                          style={{ color: isOpen ? "#C9A227" : "#0B5D3B", minWidth: 64 }}
+                        >
+                          Module {idx + 1}:
+                        </span>
+                        <span
+                          className="flex-1 text-sm font-bold"
+                          style={{ color: isOpen ? "#fff" : "#073d27" }}
+                        >
+                          {mod.title.replace(/^Module \d+: /, "")}
+                        </span>
+                        {isOpen
+                          ? <FiChevronUp className="size-4 shrink-0" style={{ color: "#C9A227" }} />
+                          : <FiChevronDown className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                        }
+                      </button>
+                      {isOpen && (
+                        <div className="px-4 pb-4 pt-3" style={{ background: "#fff", borderTop: "1px solid #d0e8d8" }}>
+                          <ul className="space-y-2">
+                            {mod.topics.map((t) => (
+                              <li key={t} className="flex items-center gap-2.5 text-sm" style={{ color: "#444" }}>
+                                <span className="size-1.5 shrink-0 rounded-full" style={{ background: "#C9A227" }} />
+                                {t}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-                    {openModule === idx && (
-                      <div className="px-6 pb-5 pt-3" style={{ background: "#f8fcf9" }}>
-                        <ul className="space-y-2.5">
-                          {mod.topics.map((topic) => (
-                            <li key={topic} className="flex items-center gap-3 text-sm" style={{ color: "#444" }}>
-                              <span
-                                className="size-1.5 shrink-0 rounded-full"
-                                style={{ background: "#C9A227" }}
-                              />
-                              {topic}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+            {/* Prerequisites */}
+            <div className="mb-10">
+              <SectionTitle>Prerequisites</SectionTitle>
+              <CheckList items={course.prerequisites} />
+            </div>
+
+            {/* Tools & Technologies */}
+            <div className="mb-6">
+              <SectionTitle>Tools &amp; Technologies</SectionTitle>
+              <div className="flex flex-wrap gap-2">
+                {course.tools.map((tool) => (
+                  <span
+                    key={tool}
+                    className="rounded-sm px-3 py-1.5 text-xs font-semibold"
+                    style={{ background: "#f0f6f2", border: "1px solid #c5dece", color: "#0B5D3B" }}
+                  >
+                    {tool}
+                  </span>
                 ))}
               </div>
             </div>
-
-            {/* Bottom CTA mobile */}
-            <div
-              className="lg:hidden rounded-sm p-5 text-center"
-              style={{ background: "#0B5D3B" }}
-            >
-              <div className="font-display text-base font-extrabold text-white mb-1">
-                Ready to Enroll?
-              </div>
-              <p className="text-xs text-white/65 mb-4">Limited seats — apply before they fill up.</p>
-              <Link
-                to="/enroll"
-                className="block py-3 text-sm font-extrabold uppercase tracking-widest transition-opacity hover:opacity-90"
-                style={{ background: "#C9A227", color: "#073d27" }}
-              >
-                Apply Now
-              </Link>
-            </div>
           </div>
 
-          {/* RIGHT — sticky sidebar */}
-          <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start space-y-4">
+          {/* ── RIGHT SIDEBAR ── */}
+          <div className="lg:sticky lg:top-24 lg:self-start space-y-4">
 
-            {/* Details card */}
+            {/* Course Details card */}
             <div
               className="overflow-hidden rounded-sm"
-              style={{ border: "2px solid #0B5D3B" }}
+              style={{ border: "1px solid #c5dece" }}
             >
+              {/* Card header */}
               <div
-                className="flex items-center gap-3 p-4"
+                className="flex items-center gap-3 px-4 py-4"
                 style={{ background: "#0B5D3B" }}
               >
                 <div
-                  className="grid size-10 place-items-center rounded-sm"
-                  style={{ background: "rgba(255,255,255,0.13)" }}
+                  className="grid size-10 shrink-0 place-items-center rounded-sm"
+                  style={{ background: "rgba(255,255,255,0.15)" }}
                 >
                   <course.icon className="size-5 text-white" />
                 </div>
@@ -292,51 +238,52 @@ function CourseDetailPage() {
                   <div className="text-[9px] font-extrabold uppercase tracking-widest text-white/50">
                     Course Details
                   </div>
-                  <div className="text-sm font-bold text-white leading-tight">{course.title}</div>
+                  <div className="text-sm font-bold text-white">{course.title}</div>
                 </div>
               </div>
 
+              {/* Rows */}
               <div style={{ background: "#fff" }}>
                 {[
                   { label: "Level", value: course.level },
                   { label: "Duration", value: course.duration },
                   { label: "Category", value: course.category },
-                  { label: "Internship", value: course.internship ? "Included ✓" : "Not included" },
-                  { label: "Modules", value: `${course.modules.length} Modules` },
-                ].map(({ label, value }, i, arr) => (
+                  { label: "Internship", value: course.internship ? "Included" : "Not included" },
+                ].map(({ label, value }, i) => (
                   <div
                     key={label}
-                    className="flex items-center justify-between px-4 py-3"
-                    style={{ borderBottom: i < arr.length - 1 ? "1px solid #eef0ee" : "none" }}
+                    className="flex items-center justify-between px-4 py-3 text-sm"
+                    style={{ borderBottom: i < 3 ? "1px solid #eef2ee" : "none" }}
                   >
-                    <span className="text-xs font-semibold" style={{ color: "#888" }}>{label}</span>
-                    <span className="text-xs font-extrabold text-right max-w-[55%]" style={{ color: "#073d27" }}>{value}</span>
+                    <span style={{ color: "#777" }}>{label}</span>
+                    <span className="font-bold text-right max-w-[55%]" style={{ color: "#073d27" }}>{value}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="p-4 space-y-2" style={{ background: "#f8fcf9", borderTop: "1px solid #dde8e2" }}>
+              {/* Enroll CTA */}
+              <div className="px-4 pb-4 pt-3" style={{ background: "#f8fcf9", borderTop: "1px solid #eef2ee" }}>
                 <Link
                   to="/enroll"
-                  className="block w-full py-3.5 text-center text-sm font-extrabold uppercase tracking-widest text-white transition-opacity hover:opacity-90"
+                  className="block w-full py-3 text-center text-sm font-extrabold uppercase tracking-widest text-white transition-opacity hover:opacity-90"
                   style={{ background: "#0B5D3B" }}
                 >
-                  Enroll Now
+                  Enroll Now — Free Counseling
                 </Link>
                 <a
                   href="tel:+923029898082"
-                  className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold transition-colors hover:bg-white"
+                  className="mt-2 flex items-center justify-center gap-2 w-full py-2.5 text-sm font-bold transition-colors hover:bg-white"
                   style={{ border: "2px solid #0B5D3B", color: "#0B5D3B" }}
                 >
                   <FiPhone className="size-3.5" /> Call for Enquiry
                 </a>
-                <p className="text-center text-[10px] pt-1" style={{ color: "#aaa" }}>
+                <p className="mt-2 text-center text-[10px]" style={{ color: "#aaa" }}>
                   Limited seats — apply early.
                 </p>
               </div>
             </div>
 
-            {/* Counselor card */}
+            {/* Counselor box */}
             <div
               className="rounded-sm p-4"
               style={{ background: "#fff8e6", border: "1px solid #e8d08a" }}
@@ -345,13 +292,9 @@ function CourseDetailPage() {
                 Not sure which course?
               </div>
               <p className="text-xs leading-relaxed mb-3" style={{ color: "#666" }}>
-                Our counselors will help you pick the right career path.
+                Our counselors will help you choose the right career path.
               </p>
-              <a
-                href="tel:+923029898082"
-                className="inline-flex items-center gap-1.5 text-xs font-bold"
-                style={{ color: "#0B5D3B" }}
-              >
+              <a href="tel:+923029898082" className="inline-flex items-center gap-1.5 text-xs font-bold" style={{ color: "#0B5D3B" }}>
                 <FiPhone className="size-3" /> 0302-9898082 →
               </a>
             </div>
@@ -359,21 +302,20 @@ function CourseDetailPage() {
             {/* Other courses */}
             <div
               className="rounded-sm p-4"
-              style={{ background: "#fff", border: "1px solid #dde8e2" }}
+              style={{ background: "#fff", border: "1px solid #e0e8e3" }}
             >
-              <div className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "#0B5D3B" }}>
+              <div className="mb-3 text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>
                 Other Courses
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {courses
                   .filter((c) => c.slug !== course.slug)
-                  .slice(0, 4)
                   .map((c) => (
                     <Link
                       key={c.slug}
                       to="/courses/$slug"
                       params={{ slug: c.slug }}
-                      className="flex items-center gap-2.5 rounded-sm px-3 py-2 text-xs font-semibold transition-colors hover:bg-[#f8fcf9]"
+                      className="flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors hover:bg-[#f0f6f2]"
                       style={{ color: "#333", border: "1px solid #eee" }}
                     >
                       <c.icon className="size-3.5 shrink-0" style={{ color: "#0B5D3B" }} />
@@ -383,6 +325,7 @@ function CourseDetailPage() {
               </div>
             </div>
           </div>
+
         </div>
       </Container>
     </div>
