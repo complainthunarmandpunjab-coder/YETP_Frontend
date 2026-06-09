@@ -20,7 +20,6 @@ const benefits = [
   "Industry-expert trainers",
   "100% Hands-On lab training",
   "Guaranteed internships",
-  "Rs.100K scholarship available",
   "Global job readiness",
   "Lifetime alumni network",
 ];
@@ -81,7 +80,7 @@ function LeftPanel() {
       <div>
         <div className="mb-3 flex items-center gap-2">
           <HiOutlineSparkles className="size-3.5" style={{ color: "#C9A227" }} />
-          <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: "#C9A227" }}>Rs.100,000 Scholarship</span>
+          <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: "#C9A227" }}>Why YETP?</span>
         </div>
         <div className="space-y-2">
           {benefits.map((b) => (
@@ -171,7 +170,7 @@ function EnrollPage() {
   const [reg, setReg] = useState({
     name: "", father: "", email: "", phone: "", cnic: "",
     city: "", qualification: "", course: courses[0].slug,
-    scholarship: false, message: "",
+    message: "",
   });
   const [login, setLogin] = useState({ email: "", password: "" });
 
@@ -235,15 +234,6 @@ function EnrollPage() {
                   <FiChevronRight className="size-4 transition-transform group-hover:translate-x-1" style={{ color: "#ccc" }} />
                 </button>
               ))}
-            </div>
-
-            <div className="mt-5 rounded-xl p-4" style={{ background: "#fffbf0", border: "1px solid #f0e0a0" }}>
-              <div className="flex items-center gap-2.5">
-                <HiOutlineSparkles className="size-4 shrink-0" style={{ color: "#C9A227" }} />
-                <div className="text-xs font-semibold" style={{ color: "#7a5a00" }}>
-                  Rs.100,000 Scholarship Open — Register now to apply.
-                </div>
-              </div>
             </div>
 
             <p className="mt-4 text-center text-xs" style={{ color: "#bbb" }}>
@@ -400,7 +390,7 @@ function EnrollPage() {
           </button>
           <div className="flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full"
             style={{ background: "#f0f9f4", color: "#0B5D3B", border: "1px solid #c8e6d4" }}>
-            <HiOutlineSparkles className="size-3.5" /> Scholarship Available
+            <HiOutlineSparkles className="size-3.5" /> Limited Seats
           </div>
         </div>
 
@@ -471,23 +461,6 @@ function EnrollPage() {
                 </div>
               </div>
 
-              {/* Scholarship */}
-              <label className="flex items-start gap-3 rounded-xl p-4 cursor-pointer transition-colors"
-                style={{ background: reg.scholarship ? "#f0f9f4" : "#fafafa", border: `1.5px solid ${reg.scholarship ? "#0B5D3B" : "#e8f0eb"}` }}>
-                <input type="checkbox" checked={reg.scholarship}
-                  onChange={(e) => setReg({ ...reg, scholarship: e.target.checked })}
-                  className="mt-0.5 size-4" style={{ accentColor: "#0B5D3B" }} />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <HiOutlineSparkles className="size-4" style={{ color: "#C9A227" }} />
-                    <span className="text-sm font-bold" style={{ color: "#073d27" }}>Apply for Rs.100,000 Scholarship</span>
-                  </div>
-                  <div className="text-xs mt-0.5" style={{ color: "#6b6b6b" }}>
-                    Tick to be considered for merit/need-based scholarship.
-                  </div>
-                </div>
-              </label>
-
               {/* Message */}
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>Additional Message (Optional)</label>
@@ -511,28 +484,6 @@ function EnrollPage() {
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(160deg, #073d27, #0B5D3B)" }}>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <HiOutlineSparkles className="size-4" style={{ color: "#C9A227" }} />
-                  <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#C9A227" }}>Scholarship</span>
-                </div>
-                <div className="font-display text-3xl font-extrabold text-white">Rs.100,000</div>
-                <p className="mt-1 text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
-                  Merit & need-based scholarship for deserving students.
-                </p>
-              </div>
-              <div style={{ height: 2, background: "#C9A227" }} />
-              <div className="p-6">
-                <div className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: "rgba(255,255,255,0.5)" }}>Eligibility</div>
-                {["Pakistani citizen", "Age 18–30 years", "Intermediate or above", "Financial need demonstrated"].map((e) => (
-                  <div key={e} className="flex items-center gap-2 py-1.5 text-xs" style={{ color: "rgba(255,255,255,0.7)" }}>
-                    <FiCheck className="size-3 shrink-0" style={{ color: "#C9A227" }} /> {e}
-                  </div>
-                ))}
-              </div>
-            </div>
-
             <div className="rounded-2xl bg-white p-6" style={{ border: "1px solid #e8f0eb" }}>
               <div className="text-xs font-extrabold uppercase tracking-widest mb-4" style={{ color: "#0B5D3B" }}>Why YETP?</div>
               {benefits.map((b) => (

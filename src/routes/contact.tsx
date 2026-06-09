@@ -47,7 +47,7 @@ function ContactPage() {
     <div>
       <PageHero
         title="Contact Us"
-        subtitle="Admissions, scholarships, partnerships — reach out and our team will respond within 24 hours."
+        subtitle="Admissions, partnerships and enquiries — reach out and our team will respond within 24 hours."
         breadcrumb="Contact Us"
       />
 

@@ -351,45 +351,6 @@ export function HeroSection() {
   );
 }
 
-/* ── Scholarship Banner ───────────────────────────────────── */
-export function ScholarshipBanner() {
-  return (
-    <section style={{ background: "#073d27", overflow: "hidden" }}>
-      <div className="flex items-center">
-        <div
-          className="shrink-0 px-5 py-3 text-[10px] font-extrabold uppercase tracking-widest"
-          style={{ background: "#C9A227", color: "#073d27", whiteSpace: "nowrap" }}
-        >
-          Notice
-        </div>
-        <div style={{ overflow: "hidden", flex: 1 }}>
-          <div style={{ display: "flex", animation: "marquee 18s linear infinite", width: "max-content" }}>
-            {[0, 1, 2].map((i) => (
-              <span key={i} className="whitespace-nowrap py-3 text-sm font-semibold"
-                style={{ color: "rgba(255,255,255,0.85)", paddingRight: "80px" }}>
-                <strong className="text-white">Rs.100,000 Scholarship</strong> — now open for deserving youth. Limited seats.
-              </span>
-            ))}
-          </div>
-        </div>
-        <a
-          href="/enroll"
-          className="shrink-0 inline-flex items-center gap-2 px-5 py-3 text-xs font-extrabold uppercase tracking-wide transition-opacity hover:opacity-90"
-          style={{ background: "#C9A227", color: "#073d27", whiteSpace: "nowrap" }}
-        >
-          Apply for Scholarship <FiArrowRight />
-        </a>
-      </div>
-      <style>{`
-        @keyframes marquee {
-          0%   { transform: translateX(-33.333%); }
-          100% { transform: translateX(0); }
-        }
-      `}</style>
-    </section>
-  );
-}
-
 /* ── Stats Row ────────────────────────────────────────────── */
 export function StatsRow() {
   return (
@@ -802,8 +763,7 @@ export function CTASection() {
                   <span style={{ color: "#C9A227" }}>Apply Today.</span>
                 </h2>
                 <p className="mt-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-                  Join 9,000+ students already on their path. Rs.100,000 scholarship available
-                  for deserving youth. Seats per cohort are intentionally limited.
+                  Join 9,000+ students already on their path. Limited seats per cohort — apply early to secure your spot.
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">

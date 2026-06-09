@@ -14,7 +14,7 @@ const sections = [
   },
   {
     title: "2. Fee Policy",
-    body: `Course fees must be paid in full at the time of enrollment unless a written installment agreement has been made with management. Once submitted, fees are non-refundable after the commencement of classes. In case of a batch cancellation by YETP, a full refund will be issued. Scholarship awards are at the sole discretion of YETP management and may be revoked if conditions are not maintained.`,
+    body: `Course fees must be paid in full at the time of enrollment unless a written installment agreement has been made with management. Once submitted, fees are non-refundable after the commencement of classes. In case of a batch cancellation by YETP, a full refund will be issued.`,
   },
   {
     title: "3. Attendance Policy",

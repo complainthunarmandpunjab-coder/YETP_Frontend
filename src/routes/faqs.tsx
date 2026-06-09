@@ -20,10 +20,9 @@ const categories = [
     ],
   },
   {
-    label: "Fees & Scholarship",
+    label: "Fees & Payment",
     items: [
       { q: "What is the fee for YETP courses?", a: "Course fees vary by program (typically PKR 8,000–25,000 for the full duration). Visit our office or contact us for the exact fee structure of your chosen program." },
-      { q: "Is there any scholarship available?", a: "Yes! YETP offers a Rs.100,000 scholarship for deserving students based on financial need and merit. Apply and check the scholarship box on the application form to be considered." },
       { q: "What payment methods are accepted?", a: "We accept HBL bank transfer, Bank Alfalah, JazzCash (0302-9898082), EasyPaisa (0302-9898082), and cash payment at our Lahore office." },
       { q: "Can I pay the fee in installments?", a: "Installment plans are available for select programs. Please discuss this with our admissions team at the time of enrollment. Approval is subject to management discretion." },
     ],
@@ -73,7 +72,7 @@ function FaqsPage() {
     <div>
       <PageHero
         title="Frequently Asked Questions"
-        subtitle="Everything you need to know about YETP admissions, fees, courses, scholarships, and more."
+        subtitle="Everything you need to know about YETP admissions, fees, courses, and more."
         breadcrumb="FAQ's"
       />
 

@@ -1,6 +1,6 @@
 import {
   FaBullhorn, FaPalette, FaShoppingCart, FaAmazon, FaPaintBrush, FaReact,
-  FaIndustry, FaLaptopCode, FaMoneyBillWave, FaRocket, FaGlobeAmericas, FaHandHoldingHeart,
+  FaIndustry, FaLaptopCode, FaMoneyBillWave, FaRocket, FaGlobeAmericas,
 } from "react-icons/fa";
 import type { IconType } from "react-icons";
 
@@ -381,7 +381,6 @@ export const features = [
   { icon: FaMoneyBillWave, title: "Minimal Fee Structure", desc: "World-class curriculum at a fraction of the market rate. Affordable for all." },
   { icon: FaRocket, title: "Internship Opportunities", desc: "Guaranteed internships with partner companies, agencies and software houses." },
   { icon: FaGlobeAmericas, title: "Global Job Readiness", desc: "Portfolio, English fluency and freelancing skills for global career pathways." },
-  { icon: FaHandHoldingHeart, title: "Rs.100K Scholarship", desc: "Up to Rs.100,000 scholarship available for deserving youth. Limited seats." },
 ];
 
 export const testimonials = [
@@ -427,7 +426,7 @@ export const founders = [
 export const pillars = [
   { title: "Skills Development", desc: "Industry-grade, hands-on curriculum for emerging technologies." },
   { title: "Equal Opportunities", desc: "Talent first. Internships and jobs to the best trainees." },
-  { title: "Rs.100K Scholarships", desc: "Up to Rs.100,000 per deserving student — no one left behind." },
+  { title: "Career Placement", desc: "Dedicated placement support to help graduates land their first job." },
   { title: "4.0 Industrial Revolution", desc: "Training youth in technologies that shape Pakistan's future." },
 ];
 

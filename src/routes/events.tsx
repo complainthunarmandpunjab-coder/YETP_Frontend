@@ -34,18 +34,6 @@ const upcomingEvents = [
     icon: "📢",
   },
   {
-    id: 3,
-    badge: "Upcoming",
-    badgeColor: "#0B5D3B",
-    title: "Rs.100,000 Scholarship Interview Day",
-    date: "July 5, 2026",
-    time: "10:00 AM – 4:00 PM",
-    venue: "YETP Campus, New Garden Town, Lahore",
-    desc: "Shortlisted candidates for the YETP Merit Scholarship will be interviewed by the admissions committee. Bring your original CNIC, result cards, and application receipt.",
-    seats: "By invitation",
-    icon: "🎓",
-  },
-  {
     id: 4,
     badge: "Upcoming",
     badgeColor: "#0B5D3B",
@@ -150,7 +138,7 @@ function EventsPage() {
     <div>
       <PageHero
         title="Events & Announcements"
-        subtitle="Stay updated with upcoming batches, workshops, scholarship drives, and ceremonies at YETP."
+        subtitle="Stay updated with upcoming batches, workshops, and ceremonies at YETP."
       />
 
       {/* Upcoming Events */}

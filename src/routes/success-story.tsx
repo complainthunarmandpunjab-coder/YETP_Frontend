@@ -81,7 +81,7 @@ const milestones = [
   { v: "9,288+", l: "Students Trained" },
   { v: "5,326+", l: "Alumni" },
   { v: "85%",    l: "Employment Rate" },
-  { v: "PKR 1M+", l: "Scholarship Awarded" },
+  { v: "4+", l: "Years of Excellence" },
   { v: "26+",    l: "Courses Offered" },
   { v: "30+",    l: "Expert Trainers" },
 ];
