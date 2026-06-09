@@ -9,7 +9,6 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart({
       server: { entry: "server" },
-      spa: { prerender: { outputPath: "/index.html" } },
     }),
   ],
 });
