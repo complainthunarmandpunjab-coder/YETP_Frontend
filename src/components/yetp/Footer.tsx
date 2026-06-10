@@ -30,11 +30,7 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-3">
-              <div
-                className="flex size-12 items-center justify-center rounded-full border border-white/20 bg-white/10 p-1"
-              >
-                <img src={logoUrl} alt="YETP" className="size-9 object-contain" />
-              </div>
+              <img src={logoUrl} alt="YETP" className="size-14 object-contain" />
               <div>
                 <div className="font-display text-lg font-extrabold text-white">YETP</div>
                 <div className="text-[9px] font-semibold uppercase tracking-[0.25em]" style={{ color: "rgba(255,255,255,0.5)" }}>

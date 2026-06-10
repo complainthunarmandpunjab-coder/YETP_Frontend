@@ -177,10 +177,9 @@ function EnrollPage() {
   /* ── Portal ── */
   if (view === "portal") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4"
+      <div className="min-h-screen flex items-center justify-center px-4 py-10"
         style={{ background: "linear-gradient(135deg, #052b1c 0%, #0B5D3B 60%, #094831 100%)", paddingTop: 80 }}>
-        <div className="w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl"
-          style={{ display: "grid", gridTemplateColumns: "40% 60%" }}>
+        <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl md:grid-cols-[40%_60%]">
 
           {/* Left — 40% */}
           <div className="flex flex-col justify-between py-10 px-8 text-white"
@@ -210,7 +209,7 @@ function EnrollPage() {
           </div>
 
           {/* Right — 60% */}
-          <div className="bg-white py-10 px-10">
+          <div className="bg-white py-10 px-6 sm:px-10">
             <h3 className="font-display text-2xl font-extrabold" style={{ color: "#073d27" }}>Select Action</h3>
             <p className="mt-1 mb-6 text-xs" style={{ color: "#aaa" }}>Choose how you want to proceed today</p>
 

@@ -56,12 +56,11 @@ function SecHeading({
 export function HeroSection() {
   return (
     <section
-      className="relative overflow-hidden"
+      className="relative overflow-x-hidden"
       style={{
         background: "linear-gradient(145deg, #052b1c 0%, #094831 40%, #0B5D3B 100%)",
         paddingTop: 122,
         minHeight: "100vh",
-        maxHeight: "100vh",
         display: "flex",
         flexDirection: "column",
       }}
@@ -107,7 +106,7 @@ export function HeroSection() {
         }}
       />
 
-      <Container className="relative flex flex-1 items-center py-6">
+      <Container className="relative flex flex-1 items-center py-10 lg:py-6">
         <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_420px]">
 
           {/* ── LEFT ─────────────────────────────────────── */}

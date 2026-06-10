@@ -77,6 +77,10 @@ export function Navbar() {
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   const enter = (label: string) => { if (timer.current) clearTimeout(timer.current); setOpenDrop(label); };
   const leave = () => { timer.current = setTimeout(() => setOpenDrop(null), 130); };
@@ -93,8 +97,7 @@ export function Navbar() {
             <img
               src={logoUrl}
               alt="YETP Logo"
-              className="size-[46px] rounded-full object-contain"
-              style={{ border: "2px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.08)", padding: 3 }}
+              className="size-[52px] object-contain"
             />
             <div>
               <div className="font-display text-[22px] font-extrabold leading-tight text-white">YETP</div>
@@ -105,33 +108,36 @@ export function Navbar() {
           </Link>
 
           {/* Phone — center */}
-          <div className="hidden md:flex items-center gap-2 text-sm font-semibold" style={{ color: "rgba(255,255,255,0.82)" }}>
+          <div className="hidden lg:flex items-center gap-2 text-sm font-semibold" style={{ color: "rgba(255,255,255,0.82)" }}>
             <span style={{ color: "#C9A227", fontWeight: 700 }}>Make a call:</span>
             &nbsp;0302-9898082 &nbsp;||&nbsp; 0324-9881887
           </div>
 
           {/* Social — right */}
-          <div className="flex items-center gap-4">
-            {[
-              { Icon: FaFacebookF,  href: "https://www.facebook.com/share/1MUL1L7Fao/" },
-              { Icon: FaInstagram,  href: "https://www.instagram.com/yetp.pk?igsh=MWpzYndyeDV5dHo5Zg==" },
-              { Icon: FaLinkedinIn, href: "https://www.linkedin.com/company/yetp/" },
-              { Icon: FaWhatsapp, href: "https://wa.me/923029898082" },
-            ].map(({ Icon, href }, i) => (
-              <a key={i} href={href} target="_blank" rel="noopener noreferrer"
-                className="flex size-8 items-center justify-center rounded-full transition-all hover:scale-110"
-                style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#C9A227"; (e.currentTarget as HTMLElement).style.color = "#073d27"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.8)"; }}
-              >
-                <Icon className="size-3.5" />
-              </a>
-            ))}
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden sm:flex items-center gap-4">
+              {[
+                { Icon: FaFacebookF,  href: "https://www.facebook.com/share/1MUL1L7Fao/" },
+                { Icon: FaInstagram,  href: "https://www.instagram.com/yetp.pk?igsh=MWpzYndyeDV5dHo5Zg==" },
+                { Icon: FaLinkedinIn, href: "https://www.linkedin.com/company/yetp/" },
+                { Icon: FaWhatsapp, href: "https://wa.me/923029898082" },
+              ].map(({ Icon, href }, i) => (
+                <a key={i} href={href} target="_blank" rel="noopener noreferrer"
+                  className="flex size-8 items-center justify-center rounded-full transition-all hover:scale-110"
+                  style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)" }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "#C9A227"; (e.currentTarget as HTMLElement).style.color = "#073d27"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.12)"; (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.8)"; }}
+                >
+                  <Icon className="size-3.5" />
+                </a>
+              ))}
+            </div>
             {/* Mobile toggle */}
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="ml-1 flex size-9 items-center justify-center rounded lg:hidden"
+              className="flex size-9 items-center justify-center rounded lg:hidden"
               style={{ background: "rgba(255,255,255,0.15)", color: "white" }}
+              aria-label="Open menu"
             >
               {menuOpen ? <FiX className="size-5" /> : <FiMenu className="size-5" />}
             </button>
@@ -191,62 +197,117 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Mobile menu ─────────────────────────────────── */}
+      {/* ── Mobile menu (slide-in drawer) ─────────────────── */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden lg:hidden"
-            style={{ background: "#073d27" }}
-          >
-            <div className="flex flex-col px-4 py-2">
-              {navItems.map((item) => (
-                <div key={item.label}>
-                  <div className="flex items-center">
-                    <Link
-                      to={item.to as never}
-                      className={cn(
-                        "flex-1 px-3 py-3 text-sm font-semibold",
-                        pathname === item.to ? "text-[#C9A227]" : "text-white/75 hover:text-white",
-                      )}
-                    >
-                      {item.label}
-                    </Link>
-                    {item.drop && (
-                      <button
-                        onClick={() => setMobileExp(mobileExp === item.label ? null : item.label)}
-                        className="p-3 text-white/50"
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-40 lg:hidden"
+              style={{ background: "rgba(0,0,0,0.5)" }}
+              onClick={() => setMenuOpen(false)}
+            />
+
+            {/* Drawer */}
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+              className="fixed inset-y-0 right-0 z-50 flex w-[84%] max-w-[330px] flex-col overflow-y-auto lg:hidden"
+              style={{ background: "#073d27", boxShadow: "-12px 0 40px rgba(0,0,0,0.35)" }}
+            >
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src={logoUrl}
+                    alt="YETP Logo"
+                    className="size-12 object-contain"
+                  />
+                  <div>
+                    <div className="font-display text-base font-extrabold leading-tight text-white">YETP</div>
+                    <div className="text-[8px] font-bold uppercase tracking-[0.22em]" style={{ color: "#C9A227" }}>
+                      Learn · Lead · Change
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="flex size-9 items-center justify-center rounded-full transition-colors"
+                  style={{ background: "rgba(255,255,255,0.1)", color: "white" }}
+                  aria-label="Close menu"
+                >
+                  <FiX className="size-5" />
+                </button>
+              </div>
+
+              <div className="flex flex-1 flex-col px-3 py-3">
+                {navItems.map((item) => (
+                  <div key={item.label}>
+                    <div className="flex items-center">
+                      <Link
+                        to={item.to as never}
+                        className={cn(
+                          "flex-1 px-3 py-3 text-sm font-semibold",
+                          pathname === item.to ? "text-[#C9A227]" : "text-white/75 hover:text-white",
+                        )}
                       >
-                        <FiChevronDown className={cn("size-4 transition-transform", mobileExp === item.label && "rotate-180")} />
-                      </button>
+                        {item.label}
+                      </Link>
+                      {item.drop && (
+                        <button
+                          onClick={() => setMobileExp(mobileExp === item.label ? null : item.label)}
+                          className="p-3 text-white/50"
+                        >
+                          <FiChevronDown className={cn("size-4 transition-transform", mobileExp === item.label && "rotate-180")} />
+                        </button>
+                      )}
+                    </div>
+                    {item.drop && mobileExp === item.label && (
+                      <div style={{ background: "rgba(0,0,0,0.25)" }} className="ml-4 mb-1 rounded">
+                        {item.drop.map((d) => (
+                          <Link key={d.label} to={d.to as never}
+                            className="block px-5 py-2.5 text-xs text-white/65 hover:text-white transition-colors">
+                            {d.label}
+                          </Link>
+                        ))}
+                      </div>
                     )}
                   </div>
-                  {item.drop && mobileExp === item.label && (
-                    <div style={{ background: "rgba(0,0,0,0.25)" }} className="ml-4 mb-1 rounded">
-                      {item.drop.map((d) => (
-                        <Link key={d.label} to={d.to as never}
-                          className="block px-5 py-2.5 text-xs text-white/65 hover:text-white transition-colors">
-                          {d.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+                ))}
+                <a href="/candidate-login"
+                  className="mt-3 rounded-full py-3 text-center text-sm font-extrabold uppercase border"
+                  style={{ border: "1.5px solid rgba(255,255,255,0.4)", color: "white" }}>
+                  Candidate Login
+                </a>
+                <a href="/enroll"
+                  className="my-2 rounded-full py-3 text-center text-sm font-extrabold uppercase text-[#073d27]"
+                  style={{ background: "#C9A227" }}>
+                  APPLY NOW
+                </a>
+                <div className="mt-auto flex items-center justify-center gap-3 pb-1 pt-3">
+                  {[
+                    { Icon: FaFacebookF,  href: "https://www.facebook.com/share/1MUL1L7Fao/" },
+                    { Icon: FaInstagram,  href: "https://www.instagram.com/yetp.pk?igsh=MWpzYndyeDV5dHo5Zg==" },
+                    { Icon: FaLinkedinIn, href: "https://www.linkedin.com/company/yetp/" },
+                    { Icon: FaWhatsapp, href: "https://wa.me/923029898082" },
+                  ].map(({ Icon, href }, i) => (
+                    <a key={i} href={href} target="_blank" rel="noopener noreferrer"
+                      className="flex size-9 items-center justify-center rounded-full transition-all"
+                      style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.8)" }}
+                    >
+                      <Icon className="size-4" />
+                    </a>
+                  ))}
                 </div>
-              ))}
-              <a href="/candidate-login"
-                className="mt-3 rounded-full py-3 text-center text-sm font-extrabold uppercase border"
-                style={{ border: "1.5px solid rgba(255,255,255,0.4)", color: "white" }}>
-                Candidate Login
-              </a>
-              <a href="/enroll"
-                className="my-2 rounded-full py-3 text-center text-sm font-extrabold uppercase text-[#073d27]"
-                style={{ background: "#C9A227" }}>
-                APPLY NOW
-              </a>
-            </div>
-          </motion.div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>
