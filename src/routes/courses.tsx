@@ -83,7 +83,7 @@ function CoursesPage() {
                     </ul>
                     <div className="mt-auto flex flex-col gap-2 pt-5">
                       <Link
-                        to="/courses/$slug"
+                        to="/course/$slug"
                         params={{ slug: c.slug }}
                         className="flex items-center justify-center gap-2 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
                         style={{ background: "#0B5D3B" }}

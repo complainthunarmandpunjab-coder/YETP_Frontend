@@ -27,7 +27,7 @@ import { Route as CandidateLoginRouteImport } from './routes/candidate-login'
 import { Route as ApplyPhysicalRouteImport } from './routes/apply-physical'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CoursesSlugRouteImport } from './routes/courses_.$slug'
+import { Route as CourseSlugRouteImport } from './routes/course.$slug'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -119,9 +119,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CoursesSlugRoute = CoursesSlugRouteImport.update({
-  id: '/courses_/$slug',
-  path: '/courses/$slug',
+const CourseSlugRoute = CourseSlugRouteImport.update({
+  id: '/course/$slug',
+  path: '/course/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -144,7 +144,7 @@ export interface FileRoutesByFullPath {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
-  '/courses/$slug': typeof CoursesSlugRoute
+  '/course/$slug': typeof CourseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,7 +165,7 @@ export interface FileRoutesByTo {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
-  '/courses/$slug': typeof CoursesSlugRoute
+  '/course/$slug': typeof CourseSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,7 +187,7 @@ export interface FileRoutesById {
   '/success-story': typeof SuccessStoryRoute
   '/team': typeof TeamRoute
   '/terms': typeof TermsRoute
-  '/courses_/$slug': typeof CoursesSlugRoute
+  '/course/$slug': typeof CourseSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -210,7 +210,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
-    | '/courses/$slug'
+    | '/course/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -231,7 +231,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
-    | '/courses/$slug'
+    | '/course/$slug'
   id:
     | '__root__'
     | '/'
@@ -252,7 +252,7 @@ export interface FileRouteTypes {
     | '/success-story'
     | '/team'
     | '/terms'
-    | '/courses_/$slug'
+    | '/course/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -274,7 +274,7 @@ export interface RootRouteChildren {
   SuccessStoryRoute: typeof SuccessStoryRoute
   TeamRoute: typeof TeamRoute
   TermsRoute: typeof TermsRoute
-  CoursesSlugRoute: typeof CoursesSlugRoute
+  CourseSlugRoute: typeof CourseSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -405,11 +405,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/courses_/$slug': {
-      id: '/courses_/$slug'
-      path: '/courses/$slug'
-      fullPath: '/courses/$slug'
-      preLoaderRoute: typeof CoursesSlugRouteImport
+    '/course/$slug': {
+      id: '/course/$slug'
+      path: '/course/$slug'
+      fullPath: '/course/$slug'
+      preLoaderRoute: typeof CourseSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -434,7 +434,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuccessStoryRoute: SuccessStoryRoute,
   TeamRoute: TeamRoute,
   TermsRoute: TermsRoute,
-  CoursesSlugRoute: CoursesSlugRoute,
+  CourseSlugRoute: CourseSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

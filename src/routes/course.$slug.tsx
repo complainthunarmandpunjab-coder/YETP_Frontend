@@ -4,7 +4,7 @@ import { Container } from "@/components/yetp/primitives";
 import { FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp, FiPhone } from "react-icons/fi";
 import { useState } from "react";
 
-export const Route = createFileRoute("/courses_/$slug")({
+export const Route = createFileRoute("/course/$slug")({
   loader: ({ params }) => {
     const course = courses.find((c) => c.slug === params.slug);
     if (!course) throw notFound();
@@ -313,7 +313,7 @@ function CourseDetailPage() {
                   .map((c) => (
                     <Link
                       key={c.slug}
-                      to="/courses/$slug"
+                      to="/course/$slug"
                       params={{ slug: c.slug }}
                       className="flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors hover:bg-[#f0f6f2]"
                       style={{ color: "#333", border: "1px solid #eee" }}
