@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 import {
   FiArrowRight, FiPhone, FiCheck, FiStar, FiMapPin,
   FiMail, FiUsers, FiBookOpen, FiAward, FiUserCheck, FiClock,
@@ -482,13 +483,14 @@ export function CoursesSection({ limit }: { limit?: number }) {
                     ))}
                   </ul>
                   <div className="mt-auto flex gap-2 pt-5">
-                    <a
-                      href="/courses"
+                    <Link
+                      to="/course/$slug"
+                      params={{ slug: c.slug }}
                       className="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-[#0B5D3B] transition-all hover:bg-[#0B5D3B] hover:text-white hover:border-[#0B5D3B]"
                       style={{ border: "2px solid #0B5D3B" }}
                     >
                       Details
-                    </a>
+                    </Link>
                     <a
                       href="/enroll"
                       className="flex-1 py-2.5 text-center text-xs font-bold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
