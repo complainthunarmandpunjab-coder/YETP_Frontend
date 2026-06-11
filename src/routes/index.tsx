@@ -19,7 +19,7 @@ function Home() {
   return (
     <>
       <HeroSection />
-      <CoursesSection />
+      <CoursesSection limit={6} />
       <WhyYETP />
       <MissionVisionSection />
       <TestimonialsSection />
