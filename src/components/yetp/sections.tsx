@@ -507,8 +507,8 @@ export function CoursesSection({ limit }: { limit?: number }) {
           <div className="mt-10 text-center">
             <a
               href="/courses"
-              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wide transition-colors hover:bg-[#0B5D3B] hover:text-white"
-              style={{ border: "2px solid #0B5D3B", color: "#0B5D3B" }}
+              className="inline-flex items-center gap-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-[#0B5D3B] transition-colors hover:bg-[#0B5D3B] hover:text-white"
+              style={{ border: "2px solid #0B5D3B" }}
             >
               View All Programs <FiArrowRight />
             </a>
