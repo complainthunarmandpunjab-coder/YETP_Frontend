@@ -92,19 +92,13 @@ export function Navbar() {
       <div style={{ background: "#0B5D3B" }}>
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-1.5">
 
-          {/* Logo + name */}
-          <Link to="/" className="flex items-center gap-3">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
             <img
               src={logoUrl}
-              alt="YETP Logo"
-              className="size-[52px] object-contain"
+              alt="YETP - Youth Empowerment Training Program"
+              className="h-11 w-auto object-contain sm:h-12"
             />
-            <div>
-              <div className="font-display text-[22px] font-extrabold leading-tight text-white">YETP</div>
-              <div className="text-[9px] font-bold uppercase tracking-[0.22em]" style={{ color: "#C9A227" }}>
-                Learn &nbsp;·&nbsp; Lead &nbsp;·&nbsp; Change
-              </div>
-            </div>
           </Link>
 
           {/* Phone — center */}
@@ -223,19 +217,11 @@ export function Navbar() {
             >
               {/* Drawer header */}
               <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                <div className="flex items-center gap-2.5">
-                  <img
-                    src={logoUrl}
-                    alt="YETP Logo"
-                    className="size-12 object-contain"
-                  />
-                  <div>
-                    <div className="font-display text-base font-extrabold leading-tight text-white">YETP</div>
-                    <div className="text-[8px] font-bold uppercase tracking-[0.22em]" style={{ color: "#C9A227" }}>
-                      Learn · Lead · Change
-                    </div>
-                  </div>
-                </div>
+                <img
+                  src={logoUrl}
+                  alt="YETP - Youth Empowerment Training Program"
+                  className="h-9 w-auto object-contain"
+                />
                 <button
                   onClick={() => setMenuOpen(false)}
                   className="flex size-9 items-center justify-center rounded-full transition-colors"

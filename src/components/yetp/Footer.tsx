@@ -29,15 +29,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-3">
-              <img src={logoUrl} alt="YETP" className="size-14 object-contain" />
-              <div>
-                <div className="font-display text-lg font-extrabold text-white">YETP</div>
-                <div className="text-[9px] font-semibold uppercase tracking-[0.25em]" style={{ color: "rgba(255,255,255,0.5)" }}>
-                  Learn · Lead · Change
-                </div>
-              </div>
-            </div>
+            <img src={logoUrl} alt="YETP - Youth Empowerment Training Program" className="h-14 w-auto object-contain" />
             <div className="mt-3 h-0.5 w-10" style={{ background: "#C9A227" }} />
             <p className="mt-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>
               Pakistan's No.1 IT Training Institute providing professional IT Trainings with over 4,500+ Alumni since 2021. Learn, Lead and Change.
