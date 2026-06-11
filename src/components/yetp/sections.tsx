@@ -56,13 +56,10 @@ function SecHeading({
 export function HeroSection() {
   return (
     <section
-      className="relative overflow-x-hidden"
+      className="relative flex flex-col overflow-x-hidden lg:min-h-screen"
       style={{
         background: "linear-gradient(145deg, #052b1c 0%, #094831 40%, #0B5D3B 100%)",
         paddingTop: 122,
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
       }}
     >
       {/* ── Background decorations ── */}
