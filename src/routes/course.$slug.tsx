@@ -1,17 +1,19 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { courses } from "@/data/yetp";
 import { Container } from "@/components/yetp/primitives";
-import { FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp, FiPhone } from "react-icons/fi";
+import { FiArrowLeft, FiCheck, FiClock, FiChevronDown, FiChevronUp, FiPhone, FiBookOpen } from "react-icons/fi";
 import { useState } from "react";
+import courseUpdates from "../../tmp_course_updates.json";
 
 export const Route = createFileRoute("/course/$slug")({
   loader: ({ params }) => {
     const course = courses.find((c) => c.slug === params.slug);
     if (!course) throw notFound();
-    return { course };
+    const extendedData = (courseUpdates as any)[course.slug] || null;
+    return { course, extendedData };
   },
   head: ({ loaderData }) => ({
-    meta: [{ title: `${loaderData?.course.title} — YETP` }],
+    meta: [{ title: `${loaderData?.course?.title} — YETP` }],
   }),
   component: CourseDetailPage,
   notFoundComponent: () => (
@@ -51,8 +53,18 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 function CourseDetailPage() {
-  const { course } = Route.useLoaderData();
-  const [openModule, setOpenModule] = useState<number | null>(null);
+  const { course, extendedData } = Route.useLoaderData();
+
+  // Map data
+  const description = extendedData?.description || course.description;
+  const whatYouLearn = extendedData?.whatYouLearn || course.outcomes;
+  const requirements = extendedData?.requirements || course.prerequisites;
+  const materialIncludes = extendedData?.materialIncludes || course.tools;
+  const whoCanJoin = extendedData ? {
+    intro: extendedData.whoCanJoinIntro,
+    items: extendedData.whoCanJoinItems,
+    note: extendedData.whoCanJoinNote
+  } : null;
 
   return (
     <div className="min-h-screen bg-white" style={{ paddingTop: 100 }}>
@@ -108,9 +120,13 @@ function CourseDetailPage() {
               <h1 className="font-display text-3xl font-extrabold sm:text-4xl" style={{ color: "#073d27" }}>
                 {course.title}
               </h1>
-              <p className="mt-3 text-base leading-relaxed" style={{ color: "#555" }}>
-                {course.description}
-              </p>
+              
+              <div className="mt-4 prose prose-sm max-w-none leading-relaxed" style={{ color: "#555" }}>
+                {description.split('\n\n').map((p: string, i: number) => (
+                  <p key={i} className="mb-3 text-base">{p}</p>
+                ))}
+              </div>
+              
               <div className="mt-4 inline-flex items-center gap-2 text-sm font-semibold" style={{ color: "#0B5D3B" }}>
                 <span
                   className="grid size-5 place-items-center rounded-full"
@@ -126,7 +142,7 @@ function CourseDetailPage() {
             <div className="mb-10">
               <SectionTitle>What You'll Learn</SectionTitle>
               <div className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
-                {course.whatYouLearn.map((item) => (
+                {whatYouLearn.map((item: string) => (
                   <div key={item} className="flex items-start gap-2.5">
                     <span
                       className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full"
@@ -140,75 +156,48 @@ function CourseDetailPage() {
               </div>
             </div>
 
-            {/* Course Modules */}
-            <div className="mb-10">
-              <SectionTitle>Course Modules</SectionTitle>
-              <div className="space-y-2">
-                {course.modules.map((mod, idx) => {
-                  const isOpen = openModule === idx;
-                  return (
-                    <div
-                      key={idx}
-                      className="overflow-hidden rounded-sm"
-                      style={{ border: "1px solid #d0e8d8" }}
-                    >
-                      <button
-                        onClick={() => setOpenModule(isOpen ? null : idx)}
-                        className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors"
-                        style={{ background: isOpen ? "#073d27" : "#f8fcf9" }}
-                      >
-                        <span
-                          className="shrink-0 text-[10px] font-extrabold uppercase tracking-widest"
-                          style={{ color: isOpen ? "#C9A227" : "#0B5D3B", minWidth: 64 }}
-                        >
-                          Module {idx + 1}:
-                        </span>
-                        <span
-                          className="flex-1 text-sm font-bold"
-                          style={{ color: isOpen ? "#fff" : "#073d27" }}
-                        >
-                          {mod.title.replace(/^Module \d+: /, "")}
-                        </span>
-                        {isOpen
-                          ? <FiChevronUp className="size-4 shrink-0" style={{ color: "#C9A227" }} />
-                          : <FiChevronDown className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
-                        }
-                      </button>
-                      {isOpen && (
-                        <div className="px-4 pb-4 pt-3" style={{ background: "#fff", borderTop: "1px solid #d0e8d8" }}>
-                          <ul className="space-y-2">
-                            {mod.topics.map((t) => (
-                              <li key={t} className="flex items-center gap-2.5 text-sm" style={{ color: "#444" }}>
-                                <span className="size-1.5 shrink-0 rounded-full" style={{ background: "#C9A227" }} />
-                                {t}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+            {/* Who Can Join */}
+            {whoCanJoin && (
+              <div className="mb-10">
+                <SectionTitle>Who Can Join This Course?</SectionTitle>
+                <div className="rounded-sm p-6" style={{ background: "#f8fcf9", border: "1px solid #d0e8d8" }}>
+                  <p className="mb-4 text-sm font-bold" style={{ color: "#073d27" }}>
+                    {whoCanJoin.intro}
+                  </p>
+                  <ul className="mb-4 space-y-2">
+                    {whoCanJoin.items.map((item: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-sm" style={{ color: "#444" }}>
+                        <span className="mt-1.5 size-1.5 shrink-0 rounded-full" style={{ background: "#C9A227" }} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-4 border-t pt-4" style={{ borderColor: "#d0e8d8" }}>
+                    <p className="text-xs font-bold" style={{ color: "#0B5D3B" }}>
+                      {whoCanJoin.note}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Prerequisites */}
+            {/* Requirements */}
             <div className="mb-10">
-              <SectionTitle>Prerequisites</SectionTitle>
-              <CheckList items={course.prerequisites} />
+              <SectionTitle>Requirements</SectionTitle>
+              <CheckList items={requirements} />
             </div>
 
-            {/* Tools & Technologies */}
+            {/* Material Includes */}
             <div className="mb-6">
-              <SectionTitle>Tools &amp; Technologies</SectionTitle>
+              <SectionTitle>Material Includes</SectionTitle>
               <div className="flex flex-wrap gap-2">
-                {course.tools.map((tool) => (
+                {materialIncludes.map((mat: string) => (
                   <span
-                    key={tool}
+                    key={mat}
                     className="rounded-sm px-3 py-1.5 text-xs font-semibold"
                     style={{ background: "#f0f6f2", border: "1px solid #c5dece", color: "#0B5D3B" }}
                   >
-                    {tool}
+                    {mat}
                   </span>
                 ))}
               </div>
@@ -248,12 +237,15 @@ function CourseDetailPage() {
                   { label: "Level", value: course.level },
                   { label: "Duration", value: course.duration },
                   { label: "Category", value: course.category },
-                  { label: "Internship", value: course.internship ? "Included" : "Not included" },
+                  { label: "Completion Certificate", value: "Yes" },
+                  { label: "Training Evaluation", value: "Yes" },
+                  { label: "Language", value: "Urdu / English" },
+                  { label: "Fee", value: "Ask for Fee" },
                 ].map(({ label, value }, i) => (
                   <div
                     key={label}
                     className="flex items-center justify-between px-4 py-3 text-sm"
-                    style={{ borderBottom: i < 3 ? "1px solid #eef2ee" : "none" }}
+                    style={{ borderBottom: "1px solid #eef2ee" }}
                   >
                     <span style={{ color: "#777" }}>{label}</span>
                     <span className="font-bold text-right max-w-[55%]" style={{ color: "#073d27" }}>{value}</span>
@@ -262,13 +254,13 @@ function CourseDetailPage() {
               </div>
 
               {/* Enroll CTA */}
-              <div className="px-4 pb-4 pt-3" style={{ background: "#f8fcf9", borderTop: "1px solid #eef2ee" }}>
+              <div className="px-4 pb-4 pt-3" style={{ background: "#f8fcf9" }}>
                 <Link
                   to="/enroll"
                   className="block w-full py-3 text-center text-sm font-extrabold uppercase tracking-widest text-white transition-opacity hover:opacity-90"
                   style={{ background: "#0B5D3B" }}
                 >
-                  Enroll Now — Free Counseling
+                  Enroll Now
                 </Link>
                 <a
                   href="tel:+923029898082"
@@ -277,9 +269,6 @@ function CourseDetailPage() {
                 >
                   <FiPhone className="size-3.5" /> Call for Enquiry
                 </a>
-                <p className="mt-2 text-center text-[10px]" style={{ color: "#aaa" }}>
-                  Limited seats — apply early.
-                </p>
               </div>
             </div>
 
@@ -299,33 +288,7 @@ function CourseDetailPage() {
               </a>
             </div>
 
-            {/* Other courses */}
-            <div
-              className="rounded-sm p-4"
-              style={{ background: "#fff", border: "1px solid #e0e8e3" }}
-            >
-              <div className="mb-3 text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>
-                Other Courses
-              </div>
-              <div className="space-y-1.5">
-                {courses
-                  .filter((c) => c.slug !== course.slug)
-                  .map((c) => (
-                    <Link
-                      key={c.slug}
-                      to="/course/$slug"
-                      params={{ slug: c.slug }}
-                      className="flex items-center gap-2 rounded-sm px-3 py-2 text-xs font-medium transition-colors hover:bg-[#f0f6f2]"
-                      style={{ color: "#333", border: "1px solid #eee" }}
-                    >
-                      <c.icon className="size-3.5 shrink-0" style={{ color: "#0B5D3B" }} />
-                      {c.title}
-                    </Link>
-                  ))}
-              </div>
-            </div>
           </div>
-
         </div>
       </Container>
     </div>
