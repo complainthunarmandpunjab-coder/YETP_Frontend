@@ -11,18 +11,16 @@ type NavItem  = { label: string; to: string; drop?: DropItem[] };
 
 const navItems: NavItem[] = [
   { label: "Home", to: "/" },
-  { label: "Our Courses", to: "/courses" },
-  { label: "About Us", to: "/about" },
+  { label: "Courses", to: "/courses" },
+  { label: "Laptop Scheme", to: "/laptop-scheme" },
   {
-    label: "Info Desk", to: "/faqs",
+    label: "About Us", to: "/about",
     drop: [
-      { label: "FAQ's",    to: "/faqs" },
-      { label: "Contact",  to: "/contact" },
-      { label: "Our Team", to: "/team" },
-      { label: "Events",   to: "/events" },
+      { label: "Our Success Story", to: "/success-story" },
     ],
   },
   { label: "LMS Portal", to: "/lms" },
+  { label: "Careers", to: "/careers" },
   {
     label: "Verification", to: "/fee-verification",
     drop: [
@@ -30,9 +28,15 @@ const navItems: NavItem[] = [
       { label: "Certificate Verification", to: "/certificate-verification" },
     ],
   },
-  { label: "Careers",           to: "/careers" },
-  { label: "Our Success Story", to: "/success-story" },
-  { label: "Laptop Scheme",     to: "/laptop-scheme" },
+  {
+    label: "Help Desk", to: "/faqs",
+    drop: [
+      { label: "FAQ's",    to: "/faqs" },
+      { label: "Contact",  to: "/contact" },
+      { label: "Our Team", to: "/team" },
+      { label: "Events",   to: "/events" },
+    ],
+  },
 ];
 
 function Dropdown({ items, open }: { items: DropItem[]; open: boolean }) {

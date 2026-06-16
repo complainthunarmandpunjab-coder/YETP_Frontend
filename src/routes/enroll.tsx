@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container } from "@/components/yetp/primitives";
 import { courses } from "@/data/yetp";
@@ -7,11 +7,14 @@ import {
   FiBook, FiCheck, FiLock, FiEye, FiEyeOff, FiChevronRight, FiLogIn
 } from "react-icons/fi";
 import { HiOutlineAcademicCap, HiOutlineSparkles, HiOutlineUserPlus } from "react-icons/hi2";
-import logoUrl from "@/assets/logo-yetp.png";
+import logoUrl from "@/assets/yetp.png";
 
 export const Route = createFileRoute("/enroll")({
   head: () => ({ meta: [{ title: "Admissions Portal — YETP" }] }),
   component: EnrollPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    view: (search.view as string) || "portal",
+  }),
 });
 
 type View = "portal" | "register" | "login" | "forgot" | "success";
@@ -166,7 +169,9 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
 
 /* ══════════════════════════════════════════════════ */
 function EnrollPage() {
-  const [view, setView] = useState<View>("portal");
+  const search = useSearch({ from: "/enroll" });
+  const initialView: View = (search.view as View) === "register" ? "register" : "portal";
+  const [view, setView] = useState<View>(initialView);
   const [reg, setReg] = useState({
     name: "", father: "", email: "", phone: "", cnic: "",
     city: "", qualification: "", course: courses[0].slug,
@@ -177,71 +182,175 @@ function EnrollPage() {
   /* ── Portal ── */
   if (view === "portal") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-10"
-        style={{ background: "linear-gradient(135deg, #052b1c 0%, #0B5D3B 60%, #094831 100%)", paddingTop: 80 }}>
-        <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl md:grid-cols-[40%_60%]">
+      <>
+        <style>{`
+          .portal-outer {
+            background-color: #052b1c;
+            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 110px 40px 60px 40px;
+            box-sizing: border-box;
+            min-height: 100vh;
+          }
+          .portal-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(2,24,15,0.85) 0%, rgba(2,24,15,0.5) 100%);
+            pointer-events: none;
+          }
+          .portal-inner {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1080px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 48px;
+            flex-wrap: wrap;
+            flex-direction: row-reverse; /* Flip layout for portal */
+          }
+          .portal-left h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 300;
+            line-height: 1.2;
+            margin: 0 0 18px 0;
+            color: #ffffff !important;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+            letter-spacing: 0.5px;
+          }
+          .portal-left p {
+            font-size: 1rem;
+            color: #ffffff !important;
+            line-height: 1.7;
+            max-width: 400px;
+            text-shadow: 0 1px 10px rgba(0,0,0,0.7);
+            margin: 0;
+            text-align: center;
+          }
+          .portal-card {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 18px;
+            padding: 32px 34px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+            flex-shrink: 0;
+            box-sizing: border-box;
+          }
+          .portal-card h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 4px 0;
+          }
+          .portal-card .subtitle {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.65);
+            margin: 0 0 22px 0;
+          }
+          .portal-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+          }
+          .portal-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+          }
+          .portal-btn-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
+          .portal-btn-text { flex: 1; }
+          .portal-btn-title { font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+          .portal-btn-sub { font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.3; }
+        `}</style>
 
-          {/* Left — 40% */}
-          <div className="flex flex-col justify-between py-10 px-8 text-white"
-            style={{ background: "linear-gradient(180deg, #052b1c 0%, #0B5D3B 100%)" }}>
-            <div className="flex flex-col items-center text-center">
-              <img src={logoUrl} alt="YETP" className="size-16 rounded-full object-contain mb-5"
-                style={{ border: "2.5px solid #C9A227", padding: 3, background: "rgba(255,255,255,0.08)" }} />
-              <div className="font-display text-xl font-extrabold leading-snug" style={{ color: "#ffffff" }}>
-                YETP Admissions Portal
-              </div>
-              <div className="mt-2 text-[11px] leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
-                Pakistan's No.1<br />IT Training Institute
-              </div>
+        <div className="portal-outer">
+          <div className="portal-overlay" />
+          <div className="portal-inner">
+
+            {/* Left */}
+            <div className="portal-left" style={{ flex: 1, minWidth: 260, maxWidth: 480, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+              <img
+                src={logoUrl}
+                alt="YETP"
+                style={{
+                  width: 110, height: 110,
+                  objectFit: "cover",
+                  borderRadius: "50%",
+                  marginBottom: 22,
+                  border: "3px solid rgba(201,162,39,0.8)",
+                  display: "block",
+                }}
+              />
+              <h1>Welcome to<br />YETP Portal</h1>
+              <p>Official Admissions Portal. Apply for new batches or access your existing candidate dashboard.</p>
             </div>
-            <div className="text-center mt-8">
-              <div className="inline-flex items-center gap-1.5 mb-3">
-                <HiOutlineSparkles className="size-3.5" style={{ color: "#C9A227" }} />
-                <span className="text-[10px] font-extrabold uppercase tracking-widest" style={{ color: "#C9A227" }}>Scholarship</span>
-              </div>
-              <div className="font-display text-2xl font-extrabold text-white">Rs.100K</div>
-              <div className="text-[10px] mt-1" style={{ color: "rgba(255,255,255,0.45)" }}>Available for deserving students</div>
-              <div className="mt-5 pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-                <div className="text-[10px] mb-1" style={{ color: "rgba(255,255,255,0.35)" }}>Need help?</div>
-                <a href="tel:+923029898082" className="text-xs font-bold text-white hover:text-[#C9A227]">0302-9898082</a>
-              </div>
-            </div>
-          </div>
 
-          {/* Right — 60% */}
-          <div className="bg-white py-10 px-6 sm:px-10">
-            <h3 className="font-display text-2xl font-extrabold" style={{ color: "#073d27" }}>Select Action</h3>
-            <p className="mt-1 mb-6 text-xs" style={{ color: "#aaa" }}>Choose how you want to proceed today</p>
+            {/* Right Card */}
+            <div className="portal-card">
+              <h2>Select Action</h2>
+              <p className="subtitle">Choose how you want to proceed today</p>
 
-            <div className="space-y-3">
-              {[
-                { icon: HiOutlineUserPlus, label: "New Registration", sub: "Apply for a new batch — 2026", action: () => setView("register") },
-                { icon: FiLogIn, label: "Candidate Login", sub: "Access your existing application", action: () => setView("login") },
-              ].map((item) => (
-                <button key={item.label} onClick={item.action}
-                  className="group flex w-full items-center gap-4 rounded-xl p-4 text-left transition-all hover:shadow-md"
-                  style={{ border: "1.5px solid #e8f5ee" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; e.currentTarget.style.background = "#f7fdf9"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e8f5ee"; e.currentTarget.style.background = "white"; }}>
-                  <div className="grid size-10 shrink-0 place-items-center rounded-lg" style={{ background: "#f0f9f4" }}>
-                    <item.icon className="size-5" style={{ color: "#0B5D3B" }} />
+              <div>
+                <button className="portal-btn" onClick={() => setView("register")}>
+                  <div className="portal-btn-icon"><HiOutlineUserPlus size={20} color="#C9A227" /></div>
+                  <div className="portal-btn-text">
+                    <div className="portal-btn-title">New Registration</div>
+                    <div className="portal-btn-sub">Apply for a new batch — 2026</div>
                   </div>
-                  <div className="flex-1">
-                    <div className="font-bold text-sm" style={{ color: "#073d27" }}>{item.label}</div>
-                    <div className="text-xs mt-0.5" style={{ color: "#bbb" }}>{item.sub}</div>
-                  </div>
-                  <FiChevronRight className="size-4 transition-transform group-hover:translate-x-1" style={{ color: "#ccc" }} />
+                  <FiChevronRight size={18} color="rgba(255,255,255,0.4)" />
                 </button>
-              ))}
+
+                <button className="portal-btn" onClick={() => window.location.href = "/candidate-login"}>
+                  <div className="portal-btn-icon"><FiLogIn size={20} color="#C9A227" /></div>
+                  <div className="portal-btn-text">
+                    <div className="portal-btn-title">Candidate Login</div>
+                    <div className="portal-btn-sub">Access your existing application</div>
+                  </div>
+                  <FiChevronRight size={18} color="rgba(255,255,255,0.4)" />
+                </button>
+              </div>
+
+              <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.1)", textAlign: "center" }}>
+                <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+                  Need support?{" "}
+                  <a href="/contact" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>Contact us</a>
+                </p>
+              </div>
             </div>
 
-            <p className="mt-4 text-center text-xs" style={{ color: "#bbb" }}>
-              Need support?{" "}
-              <a href="/contact" className="font-semibold" style={{ color: "#0B5D3B" }}>Contact us</a>
-            </p>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

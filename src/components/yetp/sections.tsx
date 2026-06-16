@@ -8,7 +8,7 @@ import { HiOutlineAcademicCap, HiOutlineSparkles } from "react-icons/hi2";
 import { Container, FadeIn } from "./primitives";
 import { courses, features, partners, pillars, testimonials } from "@/data/yetp";
 import { useState } from "react";
-import logoUrl from "@/assets/logo-yetp.png";
+import logoUrl from "@/assets/yetp.png";
 
 /* ── Section heading ─────────────────────────────────────── */
 function SecHeading({
@@ -237,11 +237,9 @@ export function HeroSection() {
                 {/* Logo circle */}
                 <div className="relative flex size-[130px] items-center justify-center rounded-full"
                   style={{
-                    background: "linear-gradient(145deg, #073d27, #0B5D3B)",
-                    border: "3px solid rgba(201,162,39,0.6)",
                     boxShadow: "0 0 0 8px rgba(201,162,39,0.08), 0 24px 60px rgba(0,0,0,0.5)",
                   }}>
-                  <img src={logoUrl} alt="YETP" className="size-20 object-contain" />
+                  <img src={logoUrl} alt="YETP" className="size-full object-cover rounded-full" style={{ border: "3px solid rgba(201,162,39,0.8)" }} />
                 </div>
                 <div className="mt-4 text-center">
                   <div className="font-display text-2xl font-extrabold text-white tracking-wide">YETP</div>
@@ -731,50 +729,40 @@ export function PartnersSection() {
 /* ── CTA ──────────────────────────────────────────────────── */
 export function CTASection() {
   return (
-    <section className="py-20 bg-white">
+    <section className="bg-white py-12">
       <Container>
         <FadeIn>
           <div
-            className="relative overflow-hidden p-10 text-white shadow-xl sm:p-14"
+            className="relative overflow-hidden px-6 py-9 text-center shadow-xl sm:px-10"
             style={{ background: "#0B5D3B" }}
           >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-[0.04]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(90deg,white 0 1px,transparent 1px 40px),repeating-linear-gradient(180deg,white 0 1px,transparent 1px 40px)",
-              }}
-            />
             {/* Gold top accent */}
             <div className="absolute inset-x-0 top-0 h-1" style={{ background: "#C9A227" }} />
 
-            <div className="relative grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div>
-                <div
-                  className="inline-block px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.3em] mb-4"
-                  style={{ background: "rgba(201,162,39,0.2)", color: "#C9A227" }}
-                >
-                  Registration Open
-                </div>
-                <h2 className="font-display text-3xl font-extrabold sm:text-4xl">
-                  Start Your Journey.<br />
-                  <span style={{ color: "#C9A227" }}>Apply Today.</span>
-                </h2>
-                <p className="mt-4 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
-                  Join 9,000+ students already on their path. Limited seats per cohort — apply early to secure your spot.
-                </p>
+            <div className="relative mx-auto max-w-xl">
+              <div
+                className="inline-block px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.3em]"
+                style={{ background: "rgba(201,162,39,0.18)", color: "#C9A227" }}
+              >
+                Registration Open
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+              <h2 className="mt-3 font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+                Start Your Journey. <span style={{ color: "#C9A227" }}>Apply Today.</span>
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.75)" }}>
+                Join 9,000+ students already on their path. Limited seats per cohort — apply early to secure your spot.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <a
                   href="/enroll"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-extrabold uppercase tracking-wide hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 text-sm font-extrabold uppercase tracking-wide shadow-lg transition-transform hover:scale-[1.02]"
                   style={{ background: "#C9A227", color: "#073d27" }}
                 >
                   Apply Now <FiArrowRight />
                 </a>
                 <a
                   href="tel:+923029898082"
-                  className="inline-flex items-center justify-center gap-2 border-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 border-2 px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-white/10"
                   style={{ borderColor: "rgba(255,255,255,0.35)" }}
                 >
                   <FiPhone /> 0302-9898082
@@ -782,9 +770,10 @@ export function CTASection() {
               </div>
             </div>
 
+            {/* Contact row */}
             <div
-              className="relative mt-8 flex flex-wrap gap-5 pt-5 text-xs"
-              style={{ borderTop: "1px solid rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.45)" }}
+              className="relative mx-auto mt-6 flex max-w-3xl flex-wrap justify-center gap-5 pt-5 text-xs"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.5)" }}
             >
               <span className="flex items-center gap-1.5"><FiMapPin className="size-3" /> New Garden Town, Lahore</span>
               <span className="flex items-center gap-1.5"><FiMail className="size-3" /> info@yetp.pk</span>
