@@ -1,13 +1,17 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
 import { Container } from "@/components/yetp/primitives";
 import { courses } from "@/data/yetp";
 import {
   FiArrowRight, FiUser, FiMail, FiPhone, FiMapPin,
-  FiBook, FiCheck, FiLock, FiEye, FiEyeOff, FiChevronRight, FiLogIn
+  FiBook, FiCheck, FiLock, FiEye, FiEyeOff, FiChevronRight, FiLogIn, FiUpload,
+  FiWifi, FiMapPin as FiLocation
 } from "react-icons/fi";
-import { HiOutlineAcademicCap, HiOutlineSparkles, HiOutlineUserPlus } from "react-icons/hi2";
+import { HiOutlineAcademicCap, HiOutlineSparkles, HiOutlineUserPlus, HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import logoUrl from "@/assets/yetp.png";
+import portalBg from "@/assets/yetpoffice.png";
+import { signup, login as loginApi, forgotPassword, ApiError } from "@/lib/api/auth";
+import { setSession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/enroll")({
   head: () => ({ meta: [{ title: "Admissions Portal — YETP" }] }),
@@ -27,14 +31,14 @@ const benefits = [
   "Lifetime alumni network",
 ];
 
-function Field({ label, value, onChange, type = "text", icon: Icon, required = true, placeholder = "" }: {
+function Field({ label, value, onChange, type = "text", icon: Icon, required = true, placeholder = "", className = "" }: {
   label: string; value: string; onChange: (v: string) => void;
-  type?: string; icon?: React.ElementType; required?: boolean; placeholder?: string;
+  type?: string; icon?: React.ElementType; required?: boolean; placeholder?: string; className?: string;
 }) {
   const [show, setShow] = useState(false);
   const isPass = type === "password";
   return (
-    <div>
+    <div className={className}>
       <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
         {label} {required && <span style={{ color: "#C9A227" }}>*</span>}
       </label>
@@ -107,6 +111,9 @@ function LeftPanel() {
 function ForgotForm({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [resetUrl, setResetUrl] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   if (sent) {
     return (
@@ -116,9 +123,16 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
           <FiMail className="size-6" />
         </div>
         <div className="font-display text-base font-extrabold" style={{ color: "#073d27" }}>Email Sent!</div>
-        <p className="mt-1 text-xs leading-relaxed mb-5" style={{ color: "#888" }}>
-          Password reset instructions have been sent to <strong>{email}</strong>. Check your inbox.
-        </p>
+        {resetUrl ? (
+          <p className="mt-1 text-xs leading-relaxed mb-5" style={{ color: "#888" }}>
+            Email isn't wired up yet (dev mode) — use this link directly:<br />
+            <a href={resetUrl} className="font-semibold break-all" style={{ color: "#0B5D3B" }}>{resetUrl}</a>
+          </p>
+        ) : (
+          <p className="mt-1 text-xs leading-relaxed mb-5" style={{ color: "#888" }}>
+            Password reset instructions have been sent to <strong>{email}</strong>. Check your inbox.
+          </p>
+        )}
         <button onClick={onBack}
           className="flex items-center gap-1.5 text-xs font-semibold hover:text-[#0B5D3B] hover:underline transition-colors"
           style={{ color: "#999" }}>
@@ -129,7 +143,20 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} className="space-y-4">
+    <form onSubmit={async (e) => {
+      e.preventDefault();
+      setError("");
+      setLoading(true);
+      try {
+        const res = await forgotPassword(email);
+        setResetUrl(res.resetUrl || "");
+        setSent(true);
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }} className="space-y-4">
       <p className="text-xs leading-relaxed" style={{ color: "#888" }}>
         Enter your registered email address and we will send you a link to reset your password.
       </p>
@@ -152,10 +179,12 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      <button type="submit"
-        className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-extrabold text-white transition-opacity hover:opacity-90"
+      {error && <p className="text-xs font-semibold" style={{ color: "#c0392b" }}>{error}</p>}
+
+      <button type="submit" disabled={loading}
+        className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-extrabold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         style={{ background: "linear-gradient(90deg, #073d27, #0B5D3B)" }}>
-        Send Reset Link <FiArrowRight />
+        {loading ? "Sending..." : "Send Reset Link"} <FiArrowRight />
       </button>
 
       <button type="button" onClick={onBack}
@@ -169,182 +198,493 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
 
 /* ══════════════════════════════════════════════════ */
 function EnrollPage() {
+  const navigate = useNavigate();
   const search = useSearch({ from: "/enroll" });
   const initialView: View = (search.view as View) === "register" ? "register" : "portal";
   const [view, setView] = useState<View>(initialView);
   const [reg, setReg] = useState({
     name: "", father: "", email: "", phone: "", cnic: "",
-    city: "", qualification: "", course: courses[0].slug,
-    message: "",
+    city: "", qualification: "", course: "",
+    password: "", dateOfBirth: "", gender: "", permanentAddress: "",
+    secondCourse: "", referralCode: "",
   });
+  const [enrollmentType, setEnrollmentType] = useState<"online" | "physical">("online");
+  const [cnicFront, setCnicFront] = useState<File | null>(null);
+  const [cnicBack, setCnicBack] = useState<File | null>(null);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [regError, setRegError] = useState("");
+  const [regLoading, setRegLoading] = useState(false);
+  const [rollNumber, setRollNumber] = useState("");
+  const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
   const [login, setLogin] = useState({ email: "", password: "" });
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    try {
+      const res = await loginApi(login);
+      setSession({ token: res.token, user: res.user });
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      setLoginError(err instanceof ApiError ? err.message : "Login failed. Please try again.");
+    } finally {
+      setLoginLoading(false);
+    }
+  }
+
+  async function handleRegister(e: React.FormEvent) {
+    e.preventDefault();
+    setRegError("");
+    if (reg.secondCourse && reg.course === reg.secondCourse) {
+      setRegError("First and second course must be different.");
+      return;
+    }
+    if (enrollmentType === "online") {
+      if (!cnicFront || !cnicBack) {
+        setRegError("Please upload both CNIC / B-Form front and back images.");
+        return;
+      }
+      if (cnicFront.size > MAX_FILE_SIZE || cnicBack.size > MAX_FILE_SIZE) {
+        setRegError("CNIC images must be 2MB or smaller.");
+        return;
+      }
+    } else {
+      if (!photo) {
+        setRegError("Please upload your passport-size photo.");
+        return;
+      }
+      if (photo.size > MAX_FILE_SIZE) {
+        setRegError("Photo must be 2MB or smaller.");
+        return;
+      }
+    }
+    if (!agreedToTerms) {
+      setRegError("Please agree to the declaration before submitting.");
+      return;
+    }
+    setRegLoading(true);
+    try {
+      const fd = new FormData();
+      fd.append("email", reg.email);
+      fd.append("password", reg.password);
+      fd.append("fullName", reg.name);
+      fd.append("fatherName", reg.father);
+      fd.append("cnic", reg.cnic.replace(/\D/g, ""));
+      fd.append("mobile", reg.phone.replace(/\D/g, ""));
+      fd.append("dateOfBirth", reg.dateOfBirth);
+      fd.append("gender", reg.gender);
+      fd.append("qualification", reg.qualification);
+      fd.append("permanentAddress", reg.permanentAddress);
+      fd.append("city", reg.city);
+      fd.append("firstCourse", reg.course);
+      if (reg.secondCourse) fd.append("secondCourse", reg.secondCourse);
+      if (reg.referralCode) fd.append("referralCode", reg.referralCode);
+      fd.append("form", enrollmentType === "physical" ? "admission" : "signup");
+      if (enrollmentType === "online") {
+        fd.append("cnicFront", cnicFront!);
+        fd.append("cnicBack", cnicBack!);
+      } else {
+        fd.append("photo", photo!);
+      }
+      const res = await signup(fd);
+      setRollNumber(res.user.rollNumber);
+      setView("success");
+    } catch (err) {
+      setRegError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setRegLoading(false);
+    }
+  }
 
   /* ── Portal ── */
   if (view === "portal") {
     return (
       <>
         <style>{`
-          .portal-outer {
-            background-color: #052b1c;
-            background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
+          .p-wrap {
+            position: relative;
             width: 100%;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            padding: 110px 40px 60px 40px;
+            overflow: hidden;
+            padding: 100px 40px 56px;
             box-sizing: border-box;
-            min-height: 100vh;
           }
-          .portal-overlay {
+          /* photo: full image visible, centered */
+          .p-bg {
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(2,24,15,0.85) 0%, rgba(2,24,15,0.5) 100%);
+            width: 100%; height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+          }
+          .p-ov {
+            position: absolute;
+            inset: 0;
+            background: rgba(3,14,8,0.52);
             pointer-events: none;
           }
-          .portal-inner {
+          /* mobile overlay: top very light, bottom dark for card */
+          @media (max-width: 820px) {
+            .p-bg { object-position: center top; }
+            .p-ov {
+              background: linear-gradient(
+                to bottom,
+                rgba(3,14,8,0.15) 0%,
+                rgba(3,14,8,0.30) 55%,
+                rgba(3,14,8,0.90) 100%
+              );
+            }
+          }
+          /* row: card left, branding text right */
+          .p-row {
             position: relative;
-            z-index: 10;
+            z-index: 5;
             width: 100%;
-            max-width: 1080px;
+            max-width: 1060px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 48px;
-            flex-wrap: wrap;
-            flex-direction: row-reverse; /* Flip layout for portal */
+            gap: 52px;
           }
-          .portal-left h1 {
-            font-size: clamp(1.8rem, 4vw, 3rem);
-            font-weight: 300;
-            line-height: 1.2;
-            margin: 0 0 18px 0;
-            color: #ffffff !important;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
-            letter-spacing: 0.5px;
-          }
-          .portal-left p {
-            font-size: 1rem;
-            color: #ffffff !important;
-            line-height: 1.7;
-            max-width: 400px;
-            text-shadow: 0 1px 10px rgba(0,0,0,0.7);
-            margin: 0;
-            text-align: center;
-          }
-          .portal-card {
-            width: 100%;
-            max-width: 400px;
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 18px;
-            padding: 32px 34px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+          /* ── card (left) ── */
+          .p-card {
             flex-shrink: 0;
+            width: 100%;
+            max-width: 370px;
+            background: rgba(5,20,12,0.60);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 20px;
+            padding: 32px 28px;
+            box-shadow: 0 20px 56px rgba(0,0,0,0.55);
             box-sizing: border-box;
           }
-          .portal-card h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0 0 4px 0;
-          }
-          .portal-card .subtitle {
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.65);
-            margin: 0 0 22px 0;
-          }
-          .portal-btn {
-            width: 100%;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #ffffff;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+          .p-card-logo {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+          .p-card-logo img {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(201,162,39,0.8);
+            object-fit: contain;
+            background: rgba(255,255,255,0.05);
+          }
+          .p-card-logo span {
+            font-size: 0.67rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+          }
+          .p-card h2 {
+            font-size: 1.48rem;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 0 3px;
+          }
+          .p-card .p-sub {
+            font-size: 0.73rem;
+            color: rgba(255,255,255,0.42);
+            margin: 0 0 20px;
+          }
+          .p-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 14px 15px;
+            border-radius: 13px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.07);
             cursor: pointer;
             text-align: left;
             transition: all 0.2s;
+            margin-bottom: 10px;
+            box-sizing: border-box;
           }
-          .portal-btn:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.4);
+          .p-btn:last-of-type { margin-bottom: 0; }
+          .p-btn:hover {
+            background: rgba(255,255,255,0.14);
+            border-color: rgba(201,162,39,0.4);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
           }
-          .portal-btn-icon {
-            width: 44px;
-            height: 44px;
+          .p-btn-icon {
+            width: 42px; height: 42px;
             border-radius: 10px;
-            background: rgba(255,255,255,0.15);
+            background: rgba(201,162,39,0.13);
+            border: 1px solid rgba(201,162,39,0.26);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+          }
+          .p-btn-title { font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+          .p-btn-sub   { font-size: 0.68rem; color: rgba(255,255,255,0.43); line-height: 1.3; }
+          .p-card-foot {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.09);
+            text-align: center;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.34);
+          }
+          .p-card-foot a { color: rgba(255,255,255,0.6); font-weight: 700; text-decoration: none; }
+          .p-card-foot a:hover { color: #C9A227; }
+
+          /* ── branding text (right, centred) ── */
+          /* desktop: p-hero is transparent wrapper, background-image ignored */
+          .p-hero {
+            flex: 1 1 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
           }
-          .portal-btn-text { flex: 1; }
-          .portal-btn-title { font-size: 0.95rem; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
-          .portal-btn-sub { font-size: 0.72rem; color: rgba(255,255,255,0.65); line-height: 1.3; }
+          /* mobile hero bg img: hidden on desktop */
+          .p-hero-bg, .p-hero-ov { display: none; }
+          .p-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .p-brand img {
+            width: 84px; height: 84px;
+            border-radius: 50%;
+            border: 3px solid rgba(201,162,39,0.85);
+            object-fit: contain;
+            background: rgba(255,255,255,0.06);
+            margin-bottom: 16px;
+          }
+          .p-brand h1 {
+            font-size: clamp(1.75rem, 3.4vw, 2.7rem);
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+            margin: 0 0 10px;
+            text-shadow: 0 2px 18px rgba(0,0,0,0.65);
+          }
+          .p-brand h1 em { font-style: normal; color: #C9A227; }
+          .p-brand p {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.92);
+            line-height: 1.65;
+            max-width: 300px;
+            margin: 0 0 20px;
+            text-shadow: 0 1px 12px rgba(0,0,0,0.85), 0 2px 24px rgba(0,0,0,0.7);
+            font-weight: 500;
+          }
+          .p-pills {
+            display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+          }
+          .p-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 100px;
+            padding: 5px 12px;
+            font-size: 0.67rem; font-weight: 700;
+            color: rgba(255,255,255,0.78);
+            white-space: nowrap;
+          }
+          .p-dot {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: #C9A227; flex-shrink: 0;
+          }
+
+          /* ══ Responsive ≤ 860px ══ */
+          @media (max-width: 860px) {
+
+            /* Override ALL desktop flex centering */
+            .p-wrap {
+              display: block;
+              padding: 0;
+              overflow: visible;
+              background: #ffffff; /* Light theme background */
+              min-height: 100vh;
+            }
+
+            /* hide global bg on mobile */
+            .p-bg, .p-ov { display: none; }
+
+            /* p-row becomes THE full-screen flex container */
+            .p-row {
+              display: flex;
+              flex-direction: column-reverse;
+              align-items: stretch;
+              justify-content: flex-start;
+              gap: 0;
+              width: 100%;
+              min-height: 100vh;
+              max-width: 100%;
+              position: static;
+            }
+
+            /* on mobile, p-hero uses its inline style backgroundImage */
+            .p-hero {
+              background-image: var(--portal-bg) !important;
+            }
+
+            /* ── HERO (top image section) ── */
+            .p-hero {
+              position: relative;
+              flex: 1;
+              min-height: 50vh;
+              overflow: hidden;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              padding: 90px 20px 32px; /* Increased to clear fixed navbar */
+            }
+            /* show the hero bg img on mobile */
+            .p-hero-bg {
+              display: block;
+              position: absolute !important;
+              inset: 0;
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              object-position: center top;
+              z-index: 0 !important;
+            }
+            .p-hero-ov {
+              display: block;
+              position: absolute !important;
+              inset: 0;
+              z-index: 1 !important;
+              pointer-events: none;
+              background: linear-gradient(
+                to bottom,
+                rgba(3,12,7,0.1) 0%,
+                rgba(3,12,7,0.50) 50%,
+                rgba(5,19,11,0.95) 100%
+              );
+            }
+
+            .p-brand {
+              position: relative;
+              z-index: 2;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              text-align: center;
+              width: 100%;
+            }
+            .p-brand img  { width: 68px; height: 68px; margin-bottom: 12px; }
+            .p-brand h1   { font-size: 1.8rem; margin-bottom: 8px; }
+            .p-brand p    { font-size: 0.83rem; max-width: 300px; margin-bottom: 14px; }
+            .p-pills      { gap: 6px; }
+            .p-pill       { font-size: 0.64rem; padding: 5px 10px; }
+
+            /* ── CARD (flush at bottom, no gap) ── */
+            .p-card {
+              flex-shrink: 0;
+              max-width: 100%;
+              width: 100%;
+              border-radius: 30px 30px 0 0;
+              border: none;
+              border-top: 1px solid #e2e8f0;
+              background: #ffffff;
+              backdrop-filter: none;
+              -webkit-backdrop-filter: none;
+              padding: 32px 24px 50px;
+              box-shadow: 0 -12px 40px rgba(0,0,0,0.08);
+              box-sizing: border-box;
+            }
+            .p-card h2        { font-size: 1.45rem; color: #0f172a; }
+            .p-card .p-sub    { color: #64748b; }
+            .p-card-logo span { color: #0f172a; }
+            
+            .p-btn { 
+              padding: 14px 16px; 
+              background: #f8fafc;
+              border: 1px solid #e2e8f0;
+            }
+            .p-btn:hover { background: #f1f5f9; border-color: #cbd5e1; box-shadow: none; transform: translateY(0); }
+            .p-btn-title { color: #0f172a; font-weight: 700; }
+            .p-btn-sub   { color: #64748b; }
+            
+            .p-card-foot { border-top-color: #e2e8f0; color: #64748b; }
+            .p-card-foot a { color: #0B5D3B; }
+          }
+
+          /* ── Small mobile ≤ 420px ══ */
+          @media (max-width: 420px) {
+            .p-hero          { min-height: 48vh; padding: 80px 16px 28px; }
+            .p-brand img     { width: 60px; height: 60px; }
+            .p-brand h1      { font-size: 1.6rem; }
+            .p-brand p       { font-size: 0.80rem; }
+            .p-card          { padding: 28px 18px 46px; border-radius: 24px 24px 0 0; }
+            .p-card h2       { font-size: 1.3rem; }
+            .p-btn           { padding: 12px 14px; }
+            .p-btn-icon      { width: 38px; height: 38px; }
+          }
         `}</style>
 
-        <div className="portal-outer">
-          <div className="portal-overlay" />
-          <div className="portal-inner">
+        <div className="p-wrap">
+          <img src={portalBg} alt="YETP Office" className="p-bg" />
+          <div className="p-ov" />
 
-            {/* Left */}
-            <div className="portal-left" style={{ flex: 1, minWidth: 260, maxWidth: 480, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-              <img
-                src={logoUrl}
-                alt="YETP"
-                style={{
-                  width: 110, height: 110,
-                  objectFit: "cover",
-                  borderRadius: "50%",
-                  marginBottom: 22,
-                  border: "3px solid rgba(201,162,39,0.8)",
-                  display: "block",
-                }}
-              />
-              <h1>Welcome to<br />YETP Portal</h1>
-              <p>Official Admissions Portal. Apply for new batches or access your existing candidate dashboard.</p>
+          <div className="p-row">
+
+            {/* LEFT — card */}
+            <div className="p-card">
+              <div className="p-card-logo">
+                <img src={logoUrl} alt="YETP" />
+                <span>YETP Portal</span>
+              </div>
+              <h2>Select Action</h2>
+              <p className="p-sub">Choose how you want to proceed today</p>
+
+              <button className="p-btn" onClick={() => setView("register")}>
+                <div className="p-btn-icon"><HiOutlineUserPlus size={19} color="#C9A227" /></div>
+                <div style={{ flex: 1 }}>
+                  <div className="p-btn-title">New Registration</div>
+                  <div className="p-btn-sub">Apply for a new batch — 2026</div>
+                </div>
+                <FiChevronRight size={15} color="rgba(255,255,255,0.35)" />
+              </button>
+
+              <button className="p-btn" onClick={() => window.location.href = "/candidate-login"}>
+                <div className="p-btn-icon"><FiLogIn size={19} color="#C9A227" /></div>
+                <div style={{ flex: 1 }}>
+                  <div className="p-btn-title">Candidate Login</div>
+                  <div className="p-btn-sub">Access your existing application</div>
+                </div>
+                <FiChevronRight size={15} color="rgba(255,255,255,0.35)" />
+              </button>
+
+              <div className="p-card-foot">
+                Need support? <a href="/contact">Contact us</a>
+              </div>
             </div>
 
-            {/* Right Card */}
-            <div className="portal-card">
-              <h2>Select Action</h2>
-              <p className="subtitle">Choose how you want to proceed today</p>
-
-              <div>
-                <button className="portal-btn" onClick={() => setView("register")}>
-                  <div className="portal-btn-icon"><HiOutlineUserPlus size={20} color="#C9A227" /></div>
-                  <div className="portal-btn-text">
-                    <div className="portal-btn-title">New Registration</div>
-                    <div className="portal-btn-sub">Apply for a new batch — 2026</div>
-                  </div>
-                  <FiChevronRight size={18} color="rgba(255,255,255,0.4)" />
-                </button>
-
-                <button className="portal-btn" onClick={() => window.location.href = "/candidate-login"}>
-                  <div className="portal-btn-icon"><FiLogIn size={20} color="#C9A227" /></div>
-                  <div className="portal-btn-text">
-                    <div className="portal-btn-title">Candidate Login</div>
-                    <div className="portal-btn-sub">Access your existing application</div>
-                  </div>
-                  <FiChevronRight size={18} color="rgba(255,255,255,0.4)" />
-                </button>
-              </div>
-
-              <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.1)", textAlign: "center" }}>
-                <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-                  Need support?{" "}
-                  <a href="/contact" style={{ color: "#ffffff", fontWeight: 700, textDecoration: "none" }}>Contact us</a>
-                </p>
+            {/* RIGHT / TOP — mobile hero with its own background */}
+            <div className="p-hero">
+              <img src={portalBg} alt="" className="p-hero-bg" aria-hidden="true" />
+              <div className="p-hero-ov" />
+              <div className="p-brand">
+                <img src={logoUrl} alt="YETP" />
+                <h1>Welcome to<br /><em>YETP</em> Portal</h1>
+                <p>Official Admissions Portal. Apply for new batches or access your existing candidate dashboard.</p>
+                <div className="p-pills">
+                  {["Free IT Training", "Laptop Scheme", "Internships", "Batch 2026"].map((t) => (
+                    <span key={t} className="p-pill"><span className="p-dot" />{t}</span>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -372,8 +712,7 @@ function EnrollPage() {
 
           {/* Form */}
           <div className="px-8 py-5">
-            <form onSubmit={(e) => { e.preventDefault(); window.open("https://lms.yetp.pk", "_blank"); }}
-              className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#666" }}>
                   Email / Username
@@ -393,7 +732,7 @@ function EnrollPage() {
               </div>
 
               <Field label="Password" value={login.password} onChange={(v) => setLogin({ ...login, password: v })}
-                icon={FiLock} type="password" placeholder="Enter your password" required={false} />
+                icon={FiLock} type="password" placeholder="Enter your password" required={true} />
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 text-xs cursor-pointer" style={{ color: "#888" }}>
@@ -406,10 +745,12 @@ function EnrollPage() {
                 </button>
               </div>
 
-              <button type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-extrabold text-white transition-opacity hover:opacity-90"
+              {loginError && <p className="text-xs font-semibold" style={{ color: "#c0392b" }}>{loginError}</p>}
+
+              <button type="submit" disabled={loginLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg py-3 text-sm font-extrabold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 style={{ background: "linear-gradient(90deg, #073d27, #0B5D3B)" }}>
-                Login <FiArrowRight />
+                {loginLoading ? "Logging in..." : "Login"} <FiArrowRight />
               </button>
             </form>
 
@@ -459,26 +800,74 @@ function EnrollPage() {
   /* ── Success ── */
   if (view === "success") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4"
-        style={{ background: "linear-gradient(135deg, #052b1c 0%, #0B5D3B 100%)", paddingTop: 90 }}>
-        <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl p-10 text-center">
-          <div className="grid size-20 place-items-center rounded-full text-white mx-auto mb-5"
-            style={{ background: "#0B5D3B" }}>
-            <FiCheck className="size-9" />
+      <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "linear-gradient(150deg, #041f14 0%, #073d27 60%, #0a4a2e 100%)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
+        <div style={{ width: "100%", maxWidth: 420, borderRadius: 20, overflow: "hidden", boxShadow: "0 32px 80px rgba(0,0,0,0.55)" }}>
+
+          {/* Header */}
+          <div style={{ background: enrollmentType === "physical" ? "linear-gradient(135deg, #041f14, #073d27)" : "linear-gradient(135deg, #041f14, #073d27)", borderBottom: "3px solid #C9A227", padding: "24px 28px 20px", textAlign: "center" }}>
+            <div style={{ position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
+              <div style={{ position: "absolute", width: 70, height: 70, borderRadius: "50%", border: "1.5px solid rgba(201,162,39,0.2)" }} />
+              <div style={{ width: 50, height: 50, borderRadius: "50%", background: "linear-gradient(135deg, #0B5D3B, #0d7048)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 2.5px rgba(201,162,39,0.45)" }}>
+                <FiCheck style={{ width: 22, height: 22, color: "#C9A227" }} />
+              </div>
+            </div>
+            <h2 style={{ margin: "0 0 4px", fontSize: "1.25rem", fontWeight: 900, color: "#fff", lineHeight: 1.3 }}>
+              Congratulations, <span style={{ color: "#C9A227" }}>{reg.name.split(" ")[0]}!</span>
+            </h2>
+            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>
+              Registration successful · Welcome to YETP
+            </p>
           </div>
-          <h3 className="font-display text-2xl font-extrabold" style={{ color: "#073d27" }}>Application Submitted!</h3>
-          <p className="mt-2 text-sm leading-relaxed" style={{ color: "#6b6b6b" }}>
-            Thank you for applying to YETP. Our admissions team will contact you within 24 hours with your batch details.
-          </p>
-          <div className="mt-6 p-4 rounded-lg" style={{ background: "#f0f9f4" }}>
-            <div className="text-xs font-bold" style={{ color: "#0B5D3B" }}>What's next?</div>
-            <p className="text-xs mt-1" style={{ color: "#555" }}>Check your email and phone — our team will confirm your seat and send payment details.</p>
+
+          {/* Body */}
+          <div style={{ background: "#fff", padding: "22px 28px 26px" }}>
+
+            {/* Step tracker */}
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+              {(enrollmentType === "physical" ? [
+                { n: "✓", label: "Registration", done: true, active: false },
+                { n: "2", label: "Visit Institute", done: false, active: true },
+                { n: "3", label: "Enrollment", done: false, active: false },
+              ] : [
+                { n: "✓", label: "Registration", done: true, active: false },
+                { n: "2", label: "Admission Test", done: false, active: true },
+                { n: "3", label: "Enrollment", done: false, active: false },
+              ] as const).map((s, i, arr) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5, flex: 1 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: s.done ? "#0B5D3B" : s.active ? "#C9A227" : "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900, color: s.done || s.active ? "#fff" : "#ccc", boxShadow: s.active ? "0 3px 10px rgba(201,162,39,0.4)" : "none" }}>
+                      {s.n}
+                    </div>
+                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.05em", color: s.done ? "#0B5D3B" : s.active ? "#C9A227" : "#ccc", textAlign: "center" as const }}>
+                      {s.label}
+                    </span>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <div style={{ flex: "0 0 24px", height: 2, background: s.done ? "#0B5D3B" : "#eee", marginBottom: 18, borderRadius: 2 }} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Info box */}
+            <div style={{ background: enrollmentType === "physical" ? "#f0f9f4" : "#f8fdf9", border: `1px solid ${enrollmentType === "physical" ? "#c8e6d4" : "#d4eede"}`, borderRadius: 10, padding: "12px 14px", marginBottom: 18 }}>
+              <p style={{ margin: 0, fontSize: 12, color: "#555", lineHeight: 1.6 }}>
+                {enrollmentType === "physical"
+                  ? <>Your physical enrollment application has been submitted. Visit our institute with your original documents to complete the enrollment process.</>
+                  : <>Your application has been registered. Log in with your email and password to start your <strong style={{ color: "#0B5D3B" }}>Admission Test</strong> and complete enrollment.</>
+                }
+              </p>
+            </div>
+
+            {/* CTA */}
+            <a href="/candidate-login" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 0", borderRadius: 10, background: enrollmentType === "physical" ? "linear-gradient(90deg, #073d27, #0B5D3B)" : "linear-gradient(90deg, #073d27, #0B5D3B)", color: "#fff", fontSize: 14, fontWeight: 800, textDecoration: "none", width: "100%", boxSizing: "border-box" as const, boxShadow: enrollmentType === "physical" ? "0 4px 16px rgba(11,93,59,0.3)" : "0 4px 16px rgba(11,93,59,0.3)" }}>
+              {enrollmentType === "physical" ? "Log In to Portal" : "Log In & Start Test"} <FiArrowRight style={{ width: 15, height: 15 }} />
+            </a>
+
+            <p style={{ textAlign: "center", fontSize: 11, color: "#bbb", margin: "10px 0 0" }}>
+              Use your registered email &amp; password
+            </p>
           </div>
-          <button onClick={() => setView("portal")}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold text-white"
-            style={{ background: "#0B5D3B" }}>
-            Back to Portal <FiArrowRight />
-          </button>
         </div>
       </div>
     );
@@ -502,23 +891,96 @@ function EnrollPage() {
           </div>
         </div>
 
+        {/* Step indicator */}
+        <div className="mb-6 flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4" style={{ border: "1px solid #e8f0eb" }}>
+          {[
+            { n: 1, label: "Student Registration" },
+            { n: 2, label: "Attempt Online Admission Test" },
+            { n: 3, label: "Enrollment Confirmation" },
+          ].map((s, i) => (
+            <div key={s.n} className="flex items-center">
+              <div className="flex flex-col items-center gap-1.5" style={{ width: 130 }}>
+                <div className="grid size-8 place-items-center rounded-full text-xs font-extrabold"
+                  style={{
+                    background: i === 0 ? "#0B5D3B" : "#f0f5f2",
+                    color: i === 0 ? "#fff" : "#999",
+                    border: i === 0 ? "none" : "1.5px solid #e0ede7",
+                  }}>
+                  {s.n}
+                </div>
+                <div className="text-center text-[10px] font-bold uppercase tracking-wide leading-tight"
+                  style={{ color: i === 0 ? "#0B5D3B" : "#999" }}>
+                  {s.label}
+                </div>
+              </div>
+              {i < 2 && <div className="h-px w-8 sm:w-14" style={{ background: "#e0ede7", marginBottom: 22 }} />}
+            </div>
+          ))}
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
 
           {/* Form card */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: "1px solid #e8f0eb" }}>
             {/* Header */}
             <div className="px-8 py-5 flex items-center gap-3"
-              style={{ background: "linear-gradient(90deg, #073d27, #0B5D3B)", borderBottom: "3px solid #C9A227" }}>
+              style={{ background: enrollmentType === "physical" ? "linear-gradient(90deg, #073d27, #0B5D3B)" : "linear-gradient(90deg, #073d27, #0B5D3B)", borderBottom: "3px solid #C9A227" }}>
               <div className="grid size-10 place-items-center rounded-full" style={{ background: "rgba(255,255,255,0.15)" }}>
                 <HiOutlineAcademicCap className="size-5 text-white" />
               </div>
               <div>
-                <div className="font-bold text-white text-sm">Online Application Form</div>
+                <div className="font-bold text-white text-sm">
+                  {enrollmentType === "physical" ? "Physical / Onsite Application Form" : "Online Application Form"}
+                </div>
                 <div className="text-[10px] font-semibold" style={{ color: "rgba(255,255,255,0.6)" }}>Batch 2026 — Limited Seats</div>
               </div>
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); setView("success"); }} className="p-8 space-y-7">
+            {/* Enrollment Type Toggle */}
+            <div className="px-8 pt-6 pb-2">
+              <div className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "#555" }}>Select Enrollment Type</div>
+              <div className="grid grid-cols-2 gap-3">
+                <button type="button" onClick={() => { setEnrollmentType("online"); setPhoto(null); }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, border: `2px solid ${enrollmentType === "online" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "online" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "online" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <FiWifi style={{ width: 16, height: 16, color: enrollmentType === "online" ? "#fff" : "#0B5D3B" }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: enrollmentType === "online" ? "#073d27" : "#555" }}>Online</div>
+                    <div style={{ fontSize: 11, color: "#999", lineHeight: 1.3 }}>Study from home</div>
+                  </div>
+                  {enrollmentType === "online" && (
+                    <div style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: "#0B5D3B", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiCheck style={{ width: 10, height: 10, color: "#fff" }} />
+                    </div>
+                  )}
+                </button>
+
+                <button type="button" onClick={() => { setEnrollmentType("physical"); setCnicFront(null); setCnicBack(null); }}
+                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, border: `2px solid ${enrollmentType === "physical" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "physical" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "physical" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <HiOutlineBuildingOffice2 style={{ width: 16, height: 16, color: enrollmentType === "physical" ? "#fff" : "#0B5D3B" }} />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: enrollmentType === "physical" ? "#073d27" : "#555" }}>Physical / Onsite</div>
+                    <div style={{ fontSize: 11, color: "#999", lineHeight: 1.3 }}>Study at institute</div>
+                  </div>
+                  {enrollmentType === "physical" && (
+                    <div style={{ marginLeft: "auto", width: 18, height: 18, borderRadius: "50%", background: "#0B5D3B", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <FiCheck style={{ width: 10, height: 10, color: "#fff" }} />
+                    </div>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="px-8 pt-6">
+              <div className="rounded-lg px-4 py-3 text-xs leading-relaxed" style={{ background: "rgba(201,162,39,0.08)", borderLeft: "3px solid #C9A227", color: "#073d27" }}>
+                <strong style={{ color: "#C9A227" }}>Notice:</strong> To become eligible for our Scholarship Card (free laptops &amp; advance courses), you must be enrolled in one or more programs under YETP.
+              </div>
+            </div>
+
+            <form onSubmit={handleRegister} className="p-8 pt-5 space-y-7">
 
               {/* Personal */}
               <div>
@@ -527,22 +989,50 @@ function EnrollPage() {
                   <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>Personal Information</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Full Name" value={reg.name} onChange={(v) => setReg({ ...reg, name: v })} icon={FiUser} placeholder="Muhammad Ali" />
-                  <Field label="Father's Name" value={reg.father} onChange={(v) => setReg({ ...reg, father: v })} icon={FiUser} placeholder="Muhammad Aslam" />
-                  <Field label="CNIC / B-Form" value={reg.cnic} onChange={(v) => setReg({ ...reg, cnic: v })} placeholder="35201-XXXXXXX-X" />
-                  <Field label="City / District" value={reg.city} onChange={(v) => setReg({ ...reg, city: v })} icon={FiMapPin} placeholder="Lahore" />
+                  <Field className="sm:col-span-2" label="Full Name" value={reg.name} onChange={(v) => setReg({ ...reg, name: v })} icon={FiUser} placeholder="Enter your full name as per your CNIC/B-Form." />
+                  <Field className="sm:col-span-2" label="Father's Name" value={reg.father} onChange={(v) => setReg({ ...reg, father: v })} icon={FiUser} placeholder="Provide your father's name as per your CNIC." />
+                  <Field className="sm:col-span-2" label="CNIC / B-Form Number" value={reg.cnic} onChange={(v) => setReg({ ...reg, cnic: v })} placeholder="Enter your 13 digits CNIC or B-Form number without hyphenation" />
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                      Date of Birth <span style={{ color: "#C9A227" }}>*</span>
+                    </label>
+                    <input type="date" required value={reg.dateOfBirth}
+                      onChange={(e) => setReg({ ...reg, dateOfBirth: e.target.value })}
+                      className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
+                      style={{ border: "1.5px solid #e0ede7" }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }} />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                      Gender <span style={{ color: "#C9A227" }}>*</span>
+                    </label>
+                    <select required value={reg.gender} onChange={(e) => setReg({ ...reg, gender: e.target.value })}
+                      className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
+                      style={{ border: "1.5px solid #e0ede7" }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }}>
+                      <option value="" disabled>Select your gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <Field className="sm:col-span-2" label="City" value={reg.city} onChange={(v) => setReg({ ...reg, city: v })} icon={FiMapPin} placeholder="Enter your city of residence." />
+                  <Field className="sm:col-span-2" label="Address" value={reg.permanentAddress} onChange={(v) => setReg({ ...reg, permanentAddress: v })} icon={FiMapPin} placeholder="Enter your complete address." />
                 </div>
               </div>
 
-              {/* Contact */}
+              {/* Contact & Account */}
               <div>
                 <div className="flex items-center gap-2 mb-4 pb-2" style={{ borderBottom: "1.5px solid #f0f5f2" }}>
                   <div className="grid size-6 place-items-center rounded-full text-white text-[10px] font-extrabold" style={{ background: "#0B5D3B" }}>2</div>
-                  <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>Contact Details</span>
+                  <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>Contact & Account</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Phone Number" value={reg.phone} onChange={(v) => setReg({ ...reg, phone: v })} icon={FiPhone} type="tel" placeholder="0302-XXXXXXX" />
-                  <Field label="Email Address" value={reg.email} onChange={(v) => setReg({ ...reg, email: v })} icon={FiMail} type="email" placeholder="you@example.com" />
+                  <Field className="sm:col-span-2" label="Email Address" value={reg.email} onChange={(v) => setReg({ ...reg, email: v })} icon={FiMail} type="email" placeholder="Provide your active email address." />
+                  <Field className="sm:col-span-2" label="Mobile Number" value={reg.phone} onChange={(v) => setReg({ ...reg, phone: v })} icon={FiPhone} type="tel" placeholder="Enter your mobile number in the format e.g. 03001234567" />
+                  <Field className="sm:col-span-2" label="Password" value={reg.password} onChange={(v) => setReg({ ...reg, password: v })} icon={FiLock} type="password" placeholder="Create a strong password (min 8 characters)" />
                 </div>
               </div>
 
@@ -553,38 +1043,122 @@ function EnrollPage() {
                   <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>Academic & Program</span>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Qualification" value={reg.qualification} onChange={(v) => setReg({ ...reg, qualification: v })} icon={FiBook} placeholder="Intermediate / B.Sc." />
-                  <div>
+                  <div className="sm:col-span-2">
                     <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
-                      Select Program <span style={{ color: "#C9A227" }}>*</span>
+                      Highest Qualification Attained <span style={{ color: "#C9A227" }}>*</span>
                     </label>
-                    <select value={reg.course} onChange={(e) => setReg({ ...reg, course: e.target.value })}
+                    <select required value={reg.qualification} onChange={(e) => setReg({ ...reg, qualification: e.target.value })}
                       className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
                       style={{ border: "1.5px solid #e0ede7" }}
                       onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
                       onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }}>
+                      <option value="" disabled>Select your highest educational qualification</option>
+                      <option value="matric">Matric</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="bachelors">Bachelor / Higher</option>
+                    </select>
+                  </div>
+                  <Field className="sm:col-span-2" label="Referral Code" value={reg.referralCode} onChange={(v) => setReg({ ...reg, referralCode: v })} icon={FiBook} required={false} placeholder="Enter referral code if you have one" />
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                      First Course <span style={{ color: "#C9A227" }}>*</span>
+                    </label>
+                    <select required value={reg.course} onChange={(e) => setReg({ ...reg, course: e.target.value })}
+                      className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
+                      style={{ border: "1.5px solid #e0ede7" }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }}>
+                      <option value="" disabled>Choose your Course</option>
+                      {courses.map((c) => <option key={c.slug} value={c.slug}>{c.title}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                      Second Course <span className="font-normal" style={{ color: "#999" }}>(Optional)</span>
+                    </label>
+                    <select value={reg.secondCourse} onChange={(e) => setReg({ ...reg, secondCourse: e.target.value })}
+                      className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
+                      style={{ border: "1.5px solid #e0ede7" }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }}>
+                      <option value="">Choose your Course (Optional)</option>
                       {courses.map((c) => <option key={c.slug} value={c.slug}>{c.title}</option>)}
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* Message */}
+              {/* Identity Verification */}
               <div>
-                <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>Additional Message (Optional)</label>
-                <textarea rows={3} value={reg.message}
-                  onChange={(e) => setReg({ ...reg, message: e.target.value })}
-                  placeholder="Any questions or additional information..."
-                  className="w-full resize-none rounded-lg border bg-white px-4 py-2.5 text-sm outline-none"
-                  style={{ border: "1.5px solid #e0ede7" }}
-                  onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; }}
-                  onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; }} />
+                <div className="flex items-center gap-2 mb-4 pb-2" style={{ borderBottom: "1.5px solid #f0f5f2" }}>
+                  <div className="grid size-6 place-items-center rounded-full text-white text-[10px] font-extrabold" style={{ background: "#0B5D3B" }}>4</div>
+                  <span className="text-xs font-extrabold uppercase tracking-widest" style={{ color: "#0B5D3B" }}>Identity Verification</span>
+                </div>
+
+                {enrollmentType === "online" ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                        Upload CNIC (Front Side) <span style={{ color: "#C9A227" }}>*</span>
+                      </label>
+                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                        style={{ border: "1.5px solid #e0ede7", color: cnicFront ? "#073d27" : "#999" }}>
+                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                        <span className="truncate">{cnicFront ? cnicFront.name : "Click to choose or drop your file here"}</span>
+                        <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
+                          onChange={(e) => setCnicFront(e.target.files?.[0] || null)} />
+                      </label>
+                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                        Upload CNIC (Back Side) <span style={{ color: "#C9A227" }}>*</span>
+                      </label>
+                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                        style={{ border: "1.5px solid #e0ede7", color: cnicBack ? "#073d27" : "#999" }}>
+                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                        <span className="truncate">{cnicBack ? cnicBack.name : "Click to choose or drop your file here"}</span>
+                        <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
+                          onChange={(e) => setCnicBack(e.target.files?.[0] || null)} />
+                      </label>
+                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="rounded-lg px-4 py-3 mb-4 text-xs leading-relaxed" style={{ background: "rgba(11,93,59,0.07)", borderLeft: "3px solid #0B5D3B", color: "#073d27" }}>
+                      <strong>Physical Enrollment:</strong> Please upload a recent passport-size photo. You will be required to bring original documents (CNIC/B-Form) when you visit the institute.
+                    </div>
+                    <div style={{ maxWidth: 320 }}>
+                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                        Passport-Size Photo <span style={{ color: "#C9A227" }}>*</span>
+                      </label>
+                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                        style={{ border: "1.5px solid #e0ede7", color: photo ? "#073d27" : "#999" }}>
+                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                        <span className="truncate">{photo ? photo.name : "Click to upload your photo"}</span>
+                        <input type="file" accept="image/png,image/jpeg" className="hidden"
+                          onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                      </label>
+                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png (Max 2MB)</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <button type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
+              {/* Declaration */}
+              <label className="flex items-start gap-2.5 text-xs leading-relaxed cursor-pointer" style={{ color: "#555" }}>
+                <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  className="mt-0.5 size-3.5 shrink-0" style={{ accentColor: "#0B5D3B" }} />
+                I declare that all the information provided is correct to the best of my knowledge, and I agree to the terms and conditions of the YETP program. <span style={{ color: "#C9A227" }}>*</span>
+              </label>
+
+              {regError && <p className="text-center text-xs font-semibold" style={{ color: "#c0392b" }}>{regError}</p>}
+
+              <button type="submit" disabled={regLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-extrabold uppercase tracking-wide text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                 style={{ background: "linear-gradient(90deg, #073d27, #0B5D3B)" }}>
-                Submit Application <FiArrowRight />
+                {regLoading ? "Submitting..." : "Submit Application"} <FiArrowRight />
               </button>
               <p className="text-center text-xs" style={{ color: "#aaa" }}>Our team will contact you within 24 hours.</p>
             </form>

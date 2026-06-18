@@ -19,12 +19,15 @@ import { Route as FastTrackRouteImport } from './routes/fast-track'
 import { Route as FaqsRouteImport } from './routes/faqs'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as EnrollRouteImport } from './routes/enroll'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CertificateVerificationRouteImport } from './routes/certificate-verification'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as CandidateLoginRouteImport } from './routes/candidate-login'
 import { Route as ApplyPhysicalRouteImport } from './routes/apply-physical'
+import { Route as AdmissionTestRouteImport } from './routes/admission-test'
+import { Route as AdmissionResultRouteImport } from './routes/admission-result'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CourseSlugRouteImport } from './routes/course.$slug'
@@ -79,6 +82,11 @@ const EnrollRoute = EnrollRouteImport.update({
   path: '/enroll',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CoursesRoute = CoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
@@ -109,6 +117,16 @@ const ApplyPhysicalRoute = ApplyPhysicalRouteImport.update({
   path: '/apply-physical',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdmissionTestRoute = AdmissionTestRouteImport.update({
+  id: '/admission-test',
+  path: '/admission-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissionResultRoute = AdmissionResultRouteImport.update({
+  id: '/admission-result',
+  path: '/admission-result',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -128,12 +146,15 @@ const CourseSlugRoute = CourseSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admission-result': typeof AdmissionResultRoute
+  '/admission-test': typeof AdmissionTestRoute
   '/apply-physical': typeof ApplyPhysicalRoute
   '/candidate-login': typeof CandidateLoginRoute
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
+  '/dashboard': typeof DashboardRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -149,12 +170,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admission-result': typeof AdmissionResultRoute
+  '/admission-test': typeof AdmissionTestRoute
   '/apply-physical': typeof ApplyPhysicalRoute
   '/candidate-login': typeof CandidateLoginRoute
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
+  '/dashboard': typeof DashboardRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -171,12 +195,15 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admission-result': typeof AdmissionResultRoute
+  '/admission-test': typeof AdmissionTestRoute
   '/apply-physical': typeof ApplyPhysicalRoute
   '/candidate-login': typeof CandidateLoginRoute
   '/careers': typeof CareersRoute
   '/certificate-verification': typeof CertificateVerificationRoute
   '/contact': typeof ContactRoute
   '/courses': typeof CoursesRoute
+  '/dashboard': typeof DashboardRoute
   '/enroll': typeof EnrollRoute
   '/events': typeof EventsRoute
   '/faqs': typeof FaqsRoute
@@ -194,12 +221,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admission-result'
+    | '/admission-test'
     | '/apply-physical'
     | '/candidate-login'
     | '/careers'
     | '/certificate-verification'
     | '/contact'
     | '/courses'
+    | '/dashboard'
     | '/enroll'
     | '/events'
     | '/faqs'
@@ -215,12 +245,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admission-result'
+    | '/admission-test'
     | '/apply-physical'
     | '/candidate-login'
     | '/careers'
     | '/certificate-verification'
     | '/contact'
     | '/courses'
+    | '/dashboard'
     | '/enroll'
     | '/events'
     | '/faqs'
@@ -236,12 +269,15 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admission-result'
+    | '/admission-test'
     | '/apply-physical'
     | '/candidate-login'
     | '/careers'
     | '/certificate-verification'
     | '/contact'
     | '/courses'
+    | '/dashboard'
     | '/enroll'
     | '/events'
     | '/faqs'
@@ -258,12 +294,15 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdmissionResultRoute: typeof AdmissionResultRoute
+  AdmissionTestRoute: typeof AdmissionTestRoute
   ApplyPhysicalRoute: typeof ApplyPhysicalRoute
   CandidateLoginRoute: typeof CandidateLoginRoute
   CareersRoute: typeof CareersRoute
   CertificateVerificationRoute: typeof CertificateVerificationRoute
   ContactRoute: typeof ContactRoute
   CoursesRoute: typeof CoursesRoute
+  DashboardRoute: typeof DashboardRoute
   EnrollRoute: typeof EnrollRoute
   EventsRoute: typeof EventsRoute
   FaqsRoute: typeof FaqsRoute
@@ -349,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EnrollRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/courses': {
       id: '/courses'
       path: '/courses'
@@ -391,6 +437,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApplyPhysicalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admission-test': {
+      id: '/admission-test'
+      path: '/admission-test'
+      fullPath: '/admission-test'
+      preLoaderRoute: typeof AdmissionTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admission-result': {
+      id: '/admission-result'
+      path: '/admission-result'
+      fullPath: '/admission-result'
+      preLoaderRoute: typeof AdmissionResultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -418,12 +478,15 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdmissionResultRoute: AdmissionResultRoute,
+  AdmissionTestRoute: AdmissionTestRoute,
   ApplyPhysicalRoute: ApplyPhysicalRoute,
   CandidateLoginRoute: CandidateLoginRoute,
   CareersRoute: CareersRoute,
   CertificateVerificationRoute: CertificateVerificationRoute,
   ContactRoute: ContactRoute,
   CoursesRoute: CoursesRoute,
+  DashboardRoute: DashboardRoute,
   EnrollRoute: EnrollRoute,
   EventsRoute: EventsRoute,
   FaqsRoute: FaqsRoute,

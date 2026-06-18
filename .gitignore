@@ -31,3 +31,11 @@ dist-ssr
 *.sln
 *.sw?
 .lovable/
+
+# Standalone backend (its own git repo — never embed/push from here)
+/yetp-backend/
+
+# Local-only env vars
+.env
+Digikhyber-punjab/
+yetp-backend/

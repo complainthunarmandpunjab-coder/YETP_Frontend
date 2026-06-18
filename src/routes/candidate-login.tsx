@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { FiArrowRight, FiEye, FiEyeOff } from "react-icons/fi";
 import logoUrl from "@/assets/yetp.png";
+import { login as loginApi, forgotPassword, ApiError } from "@/lib/api/auth";
+import { setSession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/candidate-login")({
   head: () => ({ meta: [{ title: "Candidate Login — YETP" }] }),
@@ -11,19 +13,54 @@ export const Route = createFileRoute("/candidate-login")({
 type View = "login" | "forgot";
 
 function CandidateLoginPage() {
+  const navigate = useNavigate();
   const [view, setView] = useState<View>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [sent, setSent] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
+  const [resetUrl, setResetUrl] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoginError("");
+    setLoading(true);
+    try {
+      const res = await loginApi({ email, password });
+      setSession({ token: res.token, user: res.user });
+      navigate({ to: "/admission-test" });
+    } catch (err) {
+      setLoginError(err instanceof ApiError ? err.message : "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleForgot(e: React.FormEvent) {
+    e.preventDefault();
+    setForgotError("");
+    setLoading(true);
+    try {
+      const res = await forgotPassword(forgotEmail);
+      setResetUrl(res.resetUrl || "");
+      setSent(true);
+    } catch (err) {
+      setForgotError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <>
       <style>{`
         .login-outer {
           background-color: #052b1c;
-          background-image: url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop');
+          background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2000&auto=format&fit=crop');
           background-size: cover;
           background-position: center;
           width: 100%;
@@ -148,6 +185,104 @@ function CandidateLoginPage() {
           align-items: center;
           justify-content: space-between;
         }
+
+        /* ══ Responsive ≤ 860px ══ */
+        @media (max-width: 860px) {
+          .login-outer {
+            padding: 0;
+            background: #ffffff;
+            background-image: none !important;
+            display: block;
+          }
+          .login-overlay { display: none; }
+          
+          .login-inner {
+            flex-direction: column;
+            flex-wrap: nowrap !important;
+            gap: 0;
+            min-height: 100vh;
+            height: auto;
+            max-width: 100%;
+          }
+          
+          .login-left {
+            position: relative;
+            flex: 1 !important;
+            padding: 90px 20px 32px !important;
+            background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center top;
+            max-width: 100% !important;
+            justify-content: center !important;
+          }
+          .login-left::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(3,12,7,0.25) 0%, rgba(3,12,7,0.40) 50%, rgba(5,19,11,0.95) 100%);
+            z-index: 1;
+          }
+          .login-left > * { position: relative; z-index: 2; }
+          
+          .login-left img { 
+            width: 70px !important; height: 70px !important; 
+            margin-bottom: 12px !important; border-width: 2px !important; 
+          }
+          .login-left h1 { font-size: 1.8rem !important; margin-bottom: 8px !important; }
+          .login-left p { font-size: 0.83rem !important; max-width: 300px !important; }
+
+          .login-card {
+            max-width: 100%;
+            border-radius: 30px 30px 0 0;
+            background: #ffffff;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            padding: 32px 24px 50px;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -12px 40px rgba(0,0,0,0.08);
+          }
+          .login-card h2 { color: #0f172a; font-size: 1.45rem; }
+          .login-card .subtitle { color: #64748b; margin-bottom: 24px; }
+          
+          .login-label { color: #475569; font-weight: 700; }
+          .login-input { 
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            color: #0f172a;
+          }
+          .login-input:focus {
+            border-color: #0B5D3B;
+            background: #ffffff;
+          }
+          .login-input::placeholder { color: #94a3b8; }
+          
+          input:-webkit-autofill,
+          input:-webkit-autofill:hover,
+          input:-webkit-autofill:focus,
+          input:-webkit-autofill:active {
+            -webkit-text-fill-color: #0f172a !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+          }
+
+          .login-btn {
+            background: #0B5D3B;
+            color: #ffffff;
+            padding: 14px 16px;
+          }
+          .login-row label { color: #64748b !important; }
+          .login-row button { color: #0B5D3B !important; }
+        }
+        
+        /* ── Small mobile ≤ 420px ══ */
+        @media (max-width: 420px) {
+          .login-left { padding: 80px 16px 28px !important; }
+          .login-left img { width: 60px !important; height: 60px !important; }
+          .login-left h1 { font-size: 1.6rem !important; }
+          .login-left p { font-size: 0.80rem !important; }
+          .login-card { padding: 28px 18px 46px; border-radius: 24px 24px 0 0; }
+          .login-card h2 { font-size: 1.3rem; }
+        }
       `}</style>
 
       <div className="login-outer">
@@ -181,8 +316,7 @@ function CandidateLoginPage() {
 
             {/* LOGIN */}
             {view === "login" && (
-              <form className="login-form"
-                onSubmit={(e) => { e.preventDefault(); window.open("https://lms.yetp.pk", "_blank"); }}>
+              <form className="login-form" onSubmit={handleLogin}>
 
                 <div>
                   <label className="login-label">E-mail</label>
@@ -217,7 +351,11 @@ function CandidateLoginPage() {
                   </button>
                 </div>
 
-                <button type="submit" className="login-btn">Log in</button>
+                {loginError && <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "#ff8a8a", margin: 0 }}>{loginError}</p>}
+
+                <button type="submit" className="login-btn" disabled={loading} style={{ opacity: loading ? 0.7 : 1 }}>
+                  {loading ? "Logging in..." : "Log in"}
+                </button>
 
                 <p style={{ textAlign: "center", fontSize: "0.75rem", color: "rgba(255,255,255,0.6)", margin: "4px 0 0" }}>
                   Don't have an account?{" "}
@@ -232,16 +370,23 @@ function CandidateLoginPage() {
                 {sent ? (
                   <div>
                     <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "white", marginBottom: 8 }}>Email Sent!</div>
-                    <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.78)", lineHeight: 1.6, marginBottom: 20 }}>
-                      Reset instructions sent to <strong style={{ color: "white" }}>{forgotEmail}</strong>. Check your inbox.
-                    </p>
-                    <button onClick={() => { setView("login"); setSent(false); setForgotEmail(""); }}
+                    {resetUrl ? (
+                      <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.78)", lineHeight: 1.6, marginBottom: 20, wordBreak: "break-all" }}>
+                        Email isn't wired up yet (dev mode) — use this link directly:<br />
+                        <a href={resetUrl} style={{ color: "white", fontWeight: 700 }}>{resetUrl}</a>
+                      </p>
+                    ) : (
+                      <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.78)", lineHeight: 1.6, marginBottom: 20 }}>
+                        Reset instructions sent to <strong style={{ color: "white" }}>{forgotEmail}</strong>. Check your inbox.
+                      </p>
+                    )}
+                    <button onClick={() => { setView("login"); setSent(false); setForgotEmail(""); setResetUrl(""); }}
                       style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.75)", background: "none", border: "none", cursor: "pointer" }}>
                       ← Back to Login
                     </button>
                   </div>
                 ) : (
-                  <form className="login-form" onSubmit={(e) => { e.preventDefault(); setSent(true); }}>
+                  <form className="login-form" onSubmit={handleForgot}>
                     <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.75)", lineHeight: 1.6, margin: 0 }}>
                       Enter your registered email and we'll send you a link to reset your password.
                     </p>
@@ -251,8 +396,10 @@ function CandidateLoginPage() {
                         onChange={(e) => setForgotEmail(e.target.value)}
                         placeholder="Enter your e-mail" />
                     </div>
-                    <button type="submit" className="login-btn" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                      Send Reset Link <FiArrowRight size={15} />
+                    {forgotError && <p style={{ fontSize: "0.75rem", fontWeight: 600, color: "#ff8a8a", margin: 0 }}>{forgotError}</p>}
+                    <button type="submit" className="login-btn" disabled={loading}
+                      style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: loading ? 0.7 : 1 }}>
+                      {loading ? "Sending..." : "Send Reset Link"} <FiArrowRight size={15} />
                     </button>
                     <button type="button" onClick={() => setView("login")}
                       style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.75)", background: "none", border: "none", cursor: "pointer", textAlign: "center" }}>
@@ -262,6 +409,7 @@ function CandidateLoginPage() {
                 )}
               </>
             )}
+
           </div>
         </div>
       </div>
