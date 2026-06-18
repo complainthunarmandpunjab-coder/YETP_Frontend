@@ -5,7 +5,7 @@ import {
   FiArrowRight, FiFileText, FiCreditCard, FiUser, FiAward,
 } from "react-icons/fi";
 import { courses as yetp_courses } from "@/data/yetp";
-import { getProfile, type Profile, type ChallanInfo } from "@/lib/api/user";
+import { getProfile, generateChallan, type Profile, type ChallanInfo } from "@/lib/api/user";
 import { getSession } from "@/lib/auth-session";
 import { API_URL } from "@/lib/api/auth";
 
@@ -65,9 +65,21 @@ export default function AdmissionResultPage() {
     const session = getSession();
     if (!session) { navigate({ to: "/candidate-login" }); return; }
     getProfile(session.token)
-      .then((res) => {
-        setProfile(res.data.user);
-        setChallans(res.data.challans?.challans ?? []);
+      .then(async (res) => {
+        const user = res.data.user;
+        const existingChallans = res.data.challans?.challans ?? [];
+        setProfile(user);
+        setChallans(existingChallans);
+        // Auto-generate challan if user passed and no challan exists yet
+        const isPhys = (user.admissionType ?? []).includes("physical") && !(user.admissionType ?? []).includes("online");
+        if ((user.testPassed || isPhys) && existingChallans.length === 0) {
+          try {
+            await generateChallan(session.token);
+            // Refresh profile to get the new challan
+            const updated = await getProfile(session.token);
+            setChallans(updated.data.challans?.challans ?? []);
+          } catch { /* challan generation failed, will show "being processed" */ }
+        }
       })
       .finally(() => setLoading(false));
   }, [navigate]);
@@ -100,7 +112,10 @@ export default function AdmissionResultPage() {
     ? (() => {
         const stored = challan.psid;
         if (stored && stored.length === 15) return stored;
-        return "1000000" + String(challan.challanId).padStart(8, "0");
+        const idStr = String(challan.challanId);
+        // Sequential ID (≤8 digits): pad to 8. Timestamp ID (>8 digits): take last 8.
+        const part = idStr.length <= 8 ? idStr.padStart(8, "0") : idStr.slice(-8);
+        return "1000000" + part;
       })()
     : null;
 
@@ -212,7 +227,7 @@ export default function AdmissionResultPage() {
       <div style={{ maxWidth: 860, margin: "0 auto", padding: "36px 16px 0" }}>
 
         {/* Row 1: Student card + Benefits + Courses — hidden for physical students */}
-        {!isPhysical && <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+        {!isPhysical && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 20 }}>
 
           {/* Student info */}
           <div style={{ background: "#fff", borderRadius: 18, overflow: "hidden", border: "1px solid #e4ede8", boxShadow: "0 2px 12px rgba(0,0,0,0.04)" }}>
@@ -333,7 +348,7 @@ export default function AdmissionResultPage() {
 
           {/* Method toggle + Instructions — only if NOT paid */}
           {!challan?.paid && (<>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, padding: "20px 24px 16px", borderBottom: "1px solid #f0f4f1" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14, padding: "16px 16px 14px", borderBottom: "1px solid #f0f4f1" }}>
               {([
                 { key: "psid" as PayMethod, Icon: FiCreditCard, title: "PSID / Consumer No.", sub: "Pay via JazzCash, EasyPaisa or banking app (1Bill)" },
                 { key: "challan" as PayMethod, Icon: FiFileText, title: "Bank Challan (BOP)", sub: "Download & pay at any Bank of Punjab branch" },
@@ -352,7 +367,7 @@ export default function AdmissionResultPage() {
             </div>
 
             {/* Instructions */}
-            <div style={{ padding: "20px 24px 24px" }}>
+            <div style={{ padding: "16px 14px 20px" }}>
 
             {activePayMethod === "psid" && (
               <>
@@ -376,10 +391,10 @@ export default function AdmissionResultPage() {
                 </ol>
 
                 {challan ? (
-                  <div style={{ background: "linear-gradient(135deg, #f0f9f4, #e8f5ee)", border: "1.5px solid #0B5D3B", borderRadius: 14, padding: "18px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                  <div style={{ background: "linear-gradient(135deg, #f0f9f4, #e8f5ee)", border: "1.5px solid #0B5D3B", borderRadius: 14, padding: "16px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 800, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Your PSID / Consumer Number</div>
-                      <div style={{ fontSize: 24, fontWeight: 900, color: "#0B5D3B", letterSpacing: "0.06em" }}>{psidDisplay}</div>
+                      <div style={{ fontSize: "clamp(16px, 4.5vw, 24px)", fontWeight: 900, color: "#0B5D3B", letterSpacing: "0.04em", wordBreak: "break-all" }}>{psidDisplay}</div>
                     </div>
                     <button type="button" onClick={() => handleCopy(psidDisplay ?? "")}
                       style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 10, border: "1.5px solid #0B5D3B", background: copied ? "#0B5D3B" : "#fff", color: copied ? "#fff" : "#0B5D3B", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.18s" }}>
