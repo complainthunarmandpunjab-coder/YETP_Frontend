@@ -220,6 +220,7 @@ function EnrollPage() {
   const [cnicFront, setCnicFront] = useState<File | null>(null);
   const [cnicBack, setCnicBack] = useState<File | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [regError, setRegError] = useState("");
   const [regLoading, setRegLoading] = useState(false);
@@ -251,6 +252,34 @@ function EnrollPage() {
     } finally {
       setLoginLoading(false);
     }
+  }
+
+  function handlePhotoSelect(file: File | null) {
+    if (!file) { setPhoto(null); setPhotoPreview(null); return; }
+    // Resize to passport ratio (400×490) and compress to JPEG ≤150KB
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const TARGET_W = 400, TARGET_H = 490;
+      const canvas = document.createElement("canvas");
+      canvas.width = TARGET_W; canvas.height = TARGET_H;
+      const ctx = canvas.getContext("2d")!;
+      // Cover-fit: crop center
+      const srcRatio = img.width / img.height;
+      const tgtRatio = TARGET_W / TARGET_H;
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      if (srcRatio > tgtRatio) { sw = img.height * tgtRatio; sx = (img.width - sw) / 2; }
+      else { sh = img.width / tgtRatio; sy = (img.height - sh) / 2; }
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TARGET_W, TARGET_H);
+      URL.revokeObjectURL(url);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+      setPhotoPreview(dataUrl);
+      // Convert to File
+      canvas.toBlob((blob) => {
+        if (blob) setPhoto(new File([blob], "photo.jpg", { type: "image/jpeg" }));
+      }, "image/jpeg", 0.85);
+    };
+    img.src = url;
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -959,7 +988,7 @@ function EnrollPage() {
             <div className="px-4 sm:px-8 pt-6 pb-2">
               <div className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "#555" }}>Select Enrollment Type</div>
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => { setEnrollmentType("online"); setPhoto(null); }}
+                <button type="button" onClick={() => { setEnrollmentType("online"); setPhoto(null); setPhotoPreview(null); }}
                   style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 10px", borderRadius: 12, border: `2px solid ${enrollmentType === "online" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "online" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
                   <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "online" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <FiWifi style={{ width: 16, height: 16, color: enrollmentType === "online" ? "#fff" : "#0B5D3B" }} />
@@ -975,7 +1004,7 @@ function EnrollPage() {
                   )}
                 </button>
 
-                <button type="button" onClick={() => { setEnrollmentType("physical"); setCnicFront(null); setCnicBack(null); }}
+                <button type="button" onClick={() => { setEnrollmentType("physical"); setCnicFront(null); setCnicBack(null); setPhoto(null); setPhotoPreview(null); }}
                   style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 10px", borderRadius: 12, border: `2px solid ${enrollmentType === "physical" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "physical" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
                   <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "physical" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <HiOutlineBuildingOffice2 style={{ width: 16, height: 16, color: enrollmentType === "physical" ? "#fff" : "#0B5D3B" }} />
@@ -1174,15 +1203,15 @@ function EnrollPage() {
                           <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
                           <span className="truncate">{photo ? photo.name : "Click to upload your photo"}</span>
                           <input type="file" accept="image/png,image/jpeg,image/jfif" className="hidden"
-                            onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                            onChange={(e) => handlePhotoSelect(e.target.files?.[0] || null)} />
                         </label>
                         <p className="mt-1 text-[10px]" style={{ color: "#999" }}>This photo will appear on your Student ID Card · jpg, jpeg, png (Max 2MB)</p>
                       </div>
                       {/* Card preview */}
                       <div style={{ flexShrink: 0 }}>
                         <div style={{ width: 62, height: 76, background: "#eaf0eb", borderRadius: 4, overflow: "hidden", border: "2px solid #C9A227", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          {photo
-                            ? <img src={URL.createObjectURL(photo)} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          {photoPreview
+                            ? <img src={photoPreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                             : <FiUser style={{ width: 22, height: 22, color: "#bbb" }} />}
                         </div>
                         <div style={{ fontSize: 9, textAlign: "center", color: "#aaa", marginTop: 3 }}>Card Preview</div>
