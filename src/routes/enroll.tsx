@@ -11,6 +11,7 @@ import { HiOutlineAcademicCap, HiOutlineSparkles, HiOutlineUserPlus, HiOutlineBu
 import logoUrl from "@/assets/yetp.png";
 import portalBg from "@/assets/yetpoffice.png";
 import { signup, login as loginApi, forgotPassword, ApiError } from "@/lib/api/auth";
+import { getProfile } from "@/lib/api/user";
 import { setSession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/enroll")({
@@ -196,6 +197,13 @@ function ForgotForm({ onBack }: { onBack: () => void }) {
   );
 }
 
+function formatCnic(raw: string): string {
+  const d = raw.replace(/\D/g, "").slice(0, 13);
+  if (d.length <= 5) return d;
+  if (d.length <= 12) return `${d.slice(0, 5)}-${d.slice(5)}`;
+  return `${d.slice(0, 5)}-${d.slice(5, 12)}-${d.slice(12)}`;
+}
+
 /* ══════════════════════════════════════════════════ */
 function EnrollPage() {
   const navigate = useNavigate();
@@ -229,7 +237,15 @@ function EnrollPage() {
     try {
       const res = await loginApi(login);
       setSession({ token: res.token, user: res.user });
-      navigate({ to: "/dashboard" });
+      const profileRes = await getProfile(res.token);
+      const types: string[] = profileRes.data.user.admissionType ?? [];
+      const isPhysical = types.includes("physical") && !types.includes("online");
+      const testDone = profileRes.data.user.testScore !== null;
+      if (isPhysical || testDone) {
+        navigate({ to: "/admission-result" });
+      } else {
+        navigate({ to: "/admission-test" });
+      }
     } catch (err) {
       setLoginError(err instanceof ApiError ? err.message : "Login failed. Please try again.");
     } finally {
@@ -892,14 +908,14 @@ function EnrollPage() {
         </div>
 
         {/* Step indicator */}
-        <div className="mb-6 flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-4" style={{ border: "1px solid #e8f0eb" }}>
+        <div className="mb-6 flex items-center justify-center gap-2 rounded-2xl bg-white px-3 py-4" style={{ border: "1px solid #e8f0eb" }}>
           {[
             { n: 1, label: "Student Registration" },
-            { n: 2, label: "Attempt Online Admission Test" },
-            { n: 3, label: "Enrollment Confirmation" },
+            { n: 2, label: "Admission Test" },
+            { n: 3, label: "Confirmation" },
           ].map((s, i) => (
             <div key={s.n} className="flex items-center">
-              <div className="flex flex-col items-center gap-1.5" style={{ width: 130 }}>
+              <div className="flex flex-col items-center gap-1.5" style={{ width: "clamp(72px, 25vw, 130px)" }}>
                 <div className="grid size-8 place-items-center rounded-full text-xs font-extrabold"
                   style={{
                     background: i === 0 ? "#0B5D3B" : "#f0f5f2",
@@ -908,12 +924,12 @@ function EnrollPage() {
                   }}>
                   {s.n}
                 </div>
-                <div className="text-center text-[10px] font-bold uppercase tracking-wide leading-tight"
+                <div className="text-center text-[9px] sm:text-[10px] font-bold uppercase tracking-wide leading-tight"
                   style={{ color: i === 0 ? "#0B5D3B" : "#999" }}>
                   {s.label}
                 </div>
               </div>
-              {i < 2 && <div className="h-px w-8 sm:w-14" style={{ background: "#e0ede7", marginBottom: 22 }} />}
+              {i < 2 && <div className="h-px w-4 sm:w-12" style={{ background: "#e0ede7", marginBottom: 22 }} />}
             </div>
           ))}
         </div>
@@ -923,7 +939,7 @@ function EnrollPage() {
           {/* Form card */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: "1px solid #e8f0eb" }}>
             {/* Header */}
-            <div className="px-8 py-5 flex items-center gap-3"
+            <div className="px-4 sm:px-8 py-5 flex items-center gap-3"
               style={{ background: enrollmentType === "physical" ? "linear-gradient(90deg, #073d27, #0B5D3B)" : "linear-gradient(90deg, #073d27, #0B5D3B)", borderBottom: "3px solid #C9A227" }}>
               <div className="grid size-10 place-items-center rounded-full" style={{ background: "rgba(255,255,255,0.15)" }}>
                 <HiOutlineAcademicCap className="size-5 text-white" />
@@ -937,11 +953,11 @@ function EnrollPage() {
             </div>
 
             {/* Enrollment Type Toggle */}
-            <div className="px-8 pt-6 pb-2">
+            <div className="px-4 sm:px-8 pt-6 pb-2">
               <div className="text-xs font-extrabold uppercase tracking-widest mb-3" style={{ color: "#555" }}>Select Enrollment Type</div>
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" onClick={() => { setEnrollmentType("online"); setPhoto(null); }}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, border: `2px solid ${enrollmentType === "online" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "online" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 10px", borderRadius: 12, border: `2px solid ${enrollmentType === "online" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "online" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
                   <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "online" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <FiWifi style={{ width: 16, height: 16, color: enrollmentType === "online" ? "#fff" : "#0B5D3B" }} />
                   </div>
@@ -957,7 +973,7 @@ function EnrollPage() {
                 </button>
 
                 <button type="button" onClick={() => { setEnrollmentType("physical"); setCnicFront(null); setCnicBack(null); }}
-                  style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, border: `2px solid ${enrollmentType === "physical" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "physical" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
+                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 10px", borderRadius: 12, border: `2px solid ${enrollmentType === "physical" ? "#0B5D3B" : "#e4ede8"}`, background: enrollmentType === "physical" ? "#f0f9f4" : "#fafcfb", cursor: "pointer", textAlign: "left" as const, transition: "all 0.18s" }}>
                   <div style={{ width: 36, height: 36, borderRadius: 10, background: enrollmentType === "physical" ? "#0B5D3B" : "#f0f4f1", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                     <HiOutlineBuildingOffice2 style={{ width: 16, height: 16, color: enrollmentType === "physical" ? "#fff" : "#0B5D3B" }} />
                   </div>
@@ -980,7 +996,7 @@ function EnrollPage() {
               </div>
             </div>
 
-            <form onSubmit={handleRegister} className="p-8 pt-5 space-y-7">
+            <form onSubmit={handleRegister} className="p-4 sm:p-8 pt-5 space-y-7">
 
               {/* Personal */}
               <div>
@@ -991,7 +1007,26 @@ function EnrollPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field className="sm:col-span-2" label="Full Name" value={reg.name} onChange={(v) => setReg({ ...reg, name: v })} icon={FiUser} placeholder="Enter your full name as per your CNIC/B-Form." />
                   <Field className="sm:col-span-2" label="Father's Name" value={reg.father} onChange={(v) => setReg({ ...reg, father: v })} icon={FiUser} placeholder="Provide your father's name as per your CNIC." />
-                  <Field className="sm:col-span-2" label="CNIC / B-Form Number" value={reg.cnic} onChange={(v) => setReg({ ...reg, cnic: v })} placeholder="Enter your 13 digits CNIC or B-Form number without hyphenation" />
+                  <div className="sm:col-span-2">
+                    <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                      CNIC / B-Form Number <span style={{ color: "#C9A227" }}>*</span>
+                    </label>
+                    <input
+                      type="text" inputMode="numeric" required
+                      value={formatCnic(reg.cnic)}
+                      placeholder="XXXXX-XXXXXXX-X"
+                      maxLength={15}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, "").slice(0, 13);
+                        setReg({ ...reg, cnic: digits });
+                      }}
+                      className="w-full rounded-lg border bg-white px-4 py-2.5 text-sm outline-none transition-all"
+                      style={{ border: "1.5px solid #e0ede7", letterSpacing: "0.05em" }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = "#0B5D3B"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(11,93,59,0.1)"; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = "#e0ede7"; e.currentTarget.style.boxShadow = "none"; }}
+                    />
+                    <p className="mt-1 text-[10px]" style={{ color: "#aaa" }}>Format: XXXXX-XXXXXXX-X (13 digits)</p>
+                  </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
                       Date of Birth <span style={{ color: "#C9A227" }}>*</span>

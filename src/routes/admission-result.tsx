@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FiCheck, FiAlertCircle, FiCopy, FiDownload,
   FiArrowRight, FiFileText, FiCreditCard, FiUser, FiAward,
@@ -8,6 +8,7 @@ import { courses as yetp_courses } from "@/data/yetp";
 import { getProfile, generateChallan, type Profile, type ChallanInfo } from "@/lib/api/user";
 import { getSession } from "@/lib/auth-session";
 import { API_URL } from "@/lib/api/auth";
+import logoUrl from "@/assets/yetp.png";
 
 export const Route = createFileRoute("/admission-result")({
   head: () => ({ meta: [{ title: "Admission Result — YETP" }] }),
@@ -57,31 +58,45 @@ export default function AdmissionResultPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [challans, setChallans] = useState<ChallanInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingScore, setProcessingScore] = useState(false);
   const [activePayMethod, setActivePayMethod] = useState<PayMethod>("psid");
   const [activeSubTab, setActiveSubTab] = useState<SubTab>("banking");
   const [copied, setCopied] = useState(false);
+  const [generatingPsid, setGeneratingPsid] = useState(false);
+
+  useEffect(() => {
+    // Warm up Render backend immediately so Generate PSID button is instant
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}),
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     const session = getSession();
     if (!session) { navigate({ to: "/candidate-login" }); return; }
-    getProfile(session.token)
-      .then(async (res) => {
-        const user = res.data.user;
-        const existingChallans = res.data.challans?.challans ?? [];
-        setProfile(user);
-        setChallans(existingChallans);
-        // Auto-generate challan if user passed and no challan exists yet
-        const isPhys = (user.admissionType ?? []).includes("physical") && !(user.admissionType ?? []).includes("online");
-        if ((user.testPassed || isPhys) && existingChallans.length === 0) {
-          try {
-            await generateChallan(session.token);
-            // Refresh profile to get the new challan
-            const updated = await getProfile(session.token);
-            setChallans(updated.data.challans?.challans ?? []);
-          } catch { /* challan generation failed, will show "being processed" */ }
-        }
-      })
-      .finally(() => setLoading(false));
+
+    const poll = (retries = 0) => {
+      getProfile(session.token)
+        .then((res) => {
+          const user = res.data.user;
+          const existingChallans = res.data.challans?.challans ?? [];
+
+          // If score not yet saved but we know it's pending, retry for up to 30s
+          const pending = sessionStorage.getItem("yetp_pending_score");
+          if (user.testScore === null && pending && retries < 10) {
+            setProcessingScore(true);
+            setTimeout(() => poll(retries + 1), 3000);
+            return;
+          }
+          sessionStorage.removeItem("yetp_pending_score");
+          setProcessingScore(false);
+          setProfile(user);
+          setChallans(existingChallans);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    };
+    poll();
   }, [navigate]);
 
   function handleCopy(text: string) {
@@ -90,10 +105,30 @@ export default function AdmissionResultPage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  if (loading) {
+  async function handleGeneratePsid() {
+    const session = getSession();
+    if (!session) return;
+    setGeneratingPsid(true);
+    try {
+      await generateChallan(session.token);
+      const updated = await getProfile(session.token);
+      setChallans(updated.data.challans?.challans ?? []);
+    } catch {/* ignore */} finally {
+      setGeneratingPsid(false);
+    }
+  }
+
+  if (loading || processingScore) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f5f7f5", paddingTop: 90 }}>
-        <div style={{ color: "#0B5D3B", fontWeight: 700, fontSize: 14 }}>Loading your results...</div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ width: 48, height: 48, border: "4px solid #e8f0eb", borderTop: "4px solid #0B5D3B", borderRadius: "50%", animation: "spin 0.9s linear infinite", margin: "0 auto 14px" }} />
+          <div style={{ color: "#0B5D3B", fontWeight: 700, fontSize: 15 }}>
+            {processingScore ? "Saving your results..." : "Loading your results..."}
+          </div>
+          {processingScore && <div style={{ color: "#aaa", fontSize: 12, marginTop: 6 }}>This may take a few seconds</div>}
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
       </div>
     );
   }
@@ -391,20 +426,27 @@ export default function AdmissionResultPage() {
                 </ol>
 
                 {challan ? (
-                  <div style={{ background: "linear-gradient(135deg, #f0f9f4, #e8f5ee)", border: "1.5px solid #0B5D3B", borderRadius: 14, padding: "16px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-                    <div>
-                      <div style={{ fontSize: 10, fontWeight: 800, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Your PSID / Consumer Number</div>
-                      <div style={{ fontSize: "clamp(16px, 4.5vw, 24px)", fontWeight: 900, color: "#0B5D3B", letterSpacing: "0.04em", wordBreak: "break-all" }}>{psidDisplay}</div>
+                  <>
+                    <div style={{ background: "linear-gradient(135deg, #f0f9f4, #e8f5ee)", border: "1.5px solid #0B5D3B", borderRadius: 14, padding: "16px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                      <div>
+                        <div style={{ fontSize: 10, fontWeight: 800, color: "#888", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 4 }}>Your PSID / Consumer Number</div>
+                        <div style={{ fontSize: "clamp(18px, 4.5vw, 26px)", fontWeight: 900, color: "#0B5D3B", letterSpacing: "0.06em", wordBreak: "break-all", fontVariantNumeric: "tabular-nums" }}>{psidDisplay}</div>
+                      </div>
+                      <button type="button" onClick={() => handleCopy(psidDisplay ?? "")}
+                        style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 10, border: "1.5px solid #0B5D3B", background: copied ? "#0B5D3B" : "#fff", color: copied ? "#fff" : "#0B5D3B", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.18s" }}>
+                        <FiCopy style={{ width: 13, height: 13 }} />{copied ? "Copied!" : "Copy"}
+                      </button>
                     </div>
-                    <button type="button" onClick={() => handleCopy(psidDisplay ?? "")}
-                      style={{ display: "flex", alignItems: "center", gap: 7, padding: "10px 20px", borderRadius: 10, border: "1.5px solid #0B5D3B", background: copied ? "#0B5D3B" : "#fff", color: copied ? "#fff" : "#0B5D3B", fontWeight: 700, fontSize: 13, cursor: "pointer", transition: "all 0.18s" }}>
-                      <FiCopy style={{ width: 13, height: 13 }} />{copied ? "Copied!" : "Copy PSID"}
+                    <button disabled style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 8, padding: "11px 22px", borderRadius: 10, border: "none", background: "#0B5D3B", color: "#fff", fontWeight: 700, fontSize: 13, cursor: "not-allowed", opacity: 0.75, width: "100%", justifyContent: "center" }}>
+                      <FiCheck style={{ width: 15, height: 15 }} /> PSID Already Generated
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <div style={{ padding: "14px 18px", borderRadius: 12, background: "#f9fcfa", border: "1px dashed #c8e6d4", fontSize: 13, color: "#888" }}>
-                    Your PSID is being processed — please check back shortly.
-                  </div>
+                  <button type="button" onClick={handleGeneratePsid} disabled={generatingPsid}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, width: "100%", padding: "13px 22px", borderRadius: 10, border: "none", background: generatingPsid ? "#aaa" : "#0B5D3B", color: "#fff", fontWeight: 800, fontSize: 14, cursor: generatingPsid ? "not-allowed" : "pointer", transition: "all 0.18s" }}>
+                    <FiDownload style={{ width: 15, height: 15 }} />
+                    {generatingPsid ? "Generating..." : "Generate PSID"}
+                  </button>
                 )}
               </>
             )}
@@ -447,6 +489,283 @@ export default function AdmissionResultPage() {
           </div>
         </div>
 
+        {/* Student Card — always visible, locked until fee is paid */}
+        {profile && (
+          <StudentCard profile={profile} challan={challan} paid={true} />
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+// Pre-rendered circles — canvas guarantees perfect centering, no html2canvas CSS issues
+const BULLET_CIRCLES: string[] = (() => {
+  if (typeof document === "undefined") return [];
+  return [1, 2, 3, 4, 5].map(n => {
+    const c = document.createElement("canvas");
+    c.width = 80; c.height = 80;
+    const ctx = c.getContext("2d")!;
+    ctx.beginPath(); ctx.arc(40, 40, 37, 0, Math.PI * 2);
+    ctx.fillStyle = "#0B5D3B"; ctx.fill();
+    ctx.strokeStyle = "#C9A227"; ctx.lineWidth = 6; ctx.stroke();
+    ctx.fillStyle = "#C9A227";
+    ctx.font = "bold 38px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(n), 40, 41);
+    return c.toDataURL("image/png");
+  });
+})();
+
+function StudentCard({ profile, challan, paid }: { profile: Profile; challan: ChallanInfo | null; paid: boolean }) {
+  const frontRef = useRef<HTMLDivElement>(null);
+  const backRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
+
+  const fmt = (d: Date) => d.toLocaleDateString("en-PK", { day: "2-digit", month: "long", year: "numeric" });
+  const baseDate = challan?.txnDate
+    ? new Date(challan.txnDate)
+    : challan ? new Date(challan.createdAt)
+    : profile.createdAt ? new Date(profile.createdAt)
+    : new Date();
+
+  const joinDate   = fmt(baseDate);
+  const expireDate = fmt(new Date(new Date(baseDate).setFullYear(baseDate.getFullYear() + 1)));
+
+  const formatCourse = (s: string) => s.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+  async function handleDownload() {
+    if (!frontRef.current || !backRef.current) return;
+    setDownloading(true);
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const jsPDF = (await import("jspdf")).default;
+
+      const capture = async (el: HTMLElement) => {
+        const prev = { radius: el.style.borderRadius, shadow: el.style.boxShadow };
+        el.style.borderRadius = "0";
+        el.style.boxShadow = "none";
+        const canvas = await html2canvas(el, { scale: 8, useCORS: true, backgroundColor: null, logging: false });
+        el.style.borderRadius = prev.radius;
+        el.style.boxShadow = prev.shadow;
+        return canvas;
+      };
+
+      // Capture first — page size derived from actual rendered card, no overflow ever
+      const frontCanvas = await capture(frontRef.current);
+      const backCanvas  = await capture(backRef.current);
+
+      const CW_MM = 137.5;
+      const MX = 8, GAP = 6;
+      const PAGE_W = MX + CW_MM + GAP + CW_MM + MX; // = 297mm
+      const CH_MM = Math.max(
+        CW_MM * (frontCanvas.height / frontCanvas.width),
+        CW_MM * (backCanvas.height  / backCanvas.width)
+      );
+      const HEADER_H = 20, FOOTER_H = 8;
+      const PAGE_H = Math.ceil(HEADER_H + CH_MM + FOOTER_H);
+      const CARD_Y = HEADER_H;
+
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: [PAGE_W, PAGE_H] });
+
+      // Background
+      pdf.setFillColor(245, 248, 245);
+      pdf.rect(0, 0, PAGE_W, PAGE_H, "F");
+
+      // Top gold bar
+      pdf.setFillColor(201, 162, 39);
+      pdf.rect(0, 0, PAGE_W, 2.5, "F");
+
+      // Header — perfectly centered
+      const cx = PAGE_W / 2;
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(9);
+      pdf.setTextColor(7, 61, 39);
+      pdf.text("YOUTH EMPOWERMENT TRAINING PROGRAM", cx, 8.5, { align: "center" });
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(7.5);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Official Student Identity Card  ·  ${profile.rollNumber}`, cx, 14, { align: "center" });
+
+      // Gold line under header
+      pdf.setDrawColor(201, 162, 39);
+      pdf.setLineWidth(0.4);
+      pdf.line(MX, 17, PAGE_W - MX, 17);
+
+      const R = 3; // corner radius mm
+      const frontData = frontCanvas.toDataURL("image/png");
+      const backData  = backCanvas.toDataURL("image/png");
+      const frontX = MX, backX = MX + CW_MM + GAP;
+
+      // Rounded clip + shadow effect for front card
+      pdf.setFillColor(220, 220, 220);
+      pdf.roundedRect(frontX + 0.5, CARD_Y + 0.5, CW_MM, CH_MM, R, R, "F");
+      pdf.addImage(frontData, "PNG", frontX, CARD_Y, CW_MM, CH_MM);
+
+      // Rounded clip + shadow effect for back card
+      pdf.setFillColor(220, 220, 220);
+      pdf.roundedRect(backX + 0.5, CARD_Y + 0.5, CW_MM, CH_MM, R, R, "F");
+      pdf.addImage(backData, "PNG", backX, CARD_Y, CW_MM, CH_MM);
+
+      // Bottom gold bar
+      pdf.setFillColor(201, 162, 39);
+      pdf.rect(0, PAGE_H - 2, PAGE_W, 2, "F");
+
+      pdf.save(`YETP-StudentCard-${profile.rollNumber}.pdf`);
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  const photoUrl = profile.photo ? `${API_URL}${profile.photo}` : null;
+  const CW = 400, CH = 252;
+  const cardCss = `
+    .sc-wrap { overflow-x: auto; margin: 0 -16px; padding: 0 16px 16px; -webkit-overflow-scrolling: touch; }
+    .sc-row  { display: flex; gap: 20px; width: max-content; }
+  `;
+
+  return (
+    <div style={{ marginTop: 28, marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
+        <div>
+          <h3 style={{ margin: 0, fontWeight: 800, fontSize: "1rem", color: "#073d27" }}>Your Student ID Card</h3>
+          <p style={{ margin: "3px 0 0", fontSize: 12, color: "#888" }}>Official YETP Student Identity Card</p>
+        </div>
+        {paid ? (
+          <button onClick={handleDownload} disabled={downloading}
+            style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 22px", borderRadius: 10, background: "#0B5D3B", color: "#fff", fontWeight: 700, fontSize: 13, border: "none", cursor: downloading ? "not-allowed" : "pointer", opacity: downloading ? 0.7 : 1 }}>
+            <FiDownload style={{ width: 14, height: 14 }} />
+            {downloading ? "Generating..." : "Download Card (PDF)"}
+          </button>
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: 10, background: "#f0f9f4", border: "1.5px solid #c8e6d4", fontSize: 12, fontWeight: 700, color: "#0B5D3B" }}>
+            🔒 Pay fee to unlock
+          </div>
+        )}
+      </div>
+
+      <style>{cardCss}</style>
+      <div className="sc-wrap">
+      <div className="sc-row">
+
+        {/* ══ FRONT ══ */}
+        <div style={{ position: "relative", flexShrink: 0 }}>
+          {!paid && (
+            <div style={{ position: "absolute", inset: 0, zIndex: 10, borderRadius: 10, backdropFilter: "blur(6px)", background: "rgba(7,61,39,0.55)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
+              <div style={{ fontSize: 28 }}>🔒</div>
+              <div style={{ color: "#fff", fontWeight: 800, fontSize: 13 }}>Pay fee to unlock</div>
+            </div>
+          )}
+          <div ref={frontRef} style={{ width: CW, height: CH, background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: "0 6px 28px rgba(0,0,0,0.14)", fontFamily: "Arial,sans-serif", display: "flex", flexDirection: "column" }}>
+
+            {/* Header */}
+            <div style={{ background: "linear-gradient(135deg,#041f14 0%,#073d27 100%)", borderBottom: "3px solid #C9A227", padding: "8px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", border: "2px solid #C9A227", padding: 2, background: "#fff", flexShrink: 0 }}>
+                <img src={logoUrl} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} crossOrigin="anonymous" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: "#C9A227", fontWeight: 900, fontSize: 10.5, letterSpacing: "0.05em", textTransform: "uppercase" }}>Youth Empowerment Training Program</div>
+                <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 7.5, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 1.5 }}>Student Identity Card  ·  Lahore, Pakistan</div>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div style={{ flex: 1, display: "flex", padding: "8px 13px", gap: 12, overflow: "hidden" }}>
+              {/* Photo */}
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ padding: 2.5, background: "#C9A227", borderRadius: "5px 5px 0 0" }}>
+                  <div style={{ width: 74, height: 90, background: "#eaf0eb", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: 3 }}>
+                    {photoUrl
+                      ? <img src={photoUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} crossOrigin="anonymous" />
+                      : <FiUser style={{ width: 30, height: 30, color: "#aaa" }} />}
+                  </div>
+                </div>
+                <div style={{ background: "#073d27", color: "#C9A227", padding: "3px 0", borderRadius: "0 0 4px 4px", fontSize: 7, fontWeight: 900, letterSpacing: "0.04em", textAlign: "center" }}>
+                  {profile.rollNumber}
+                </div>
+              </div>
+
+              {/* Info */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 8.5, fontWeight: 800, color: "#073d27", textTransform: "uppercase", letterSpacing: "0.08em", paddingBottom: 2, marginBottom: 3, borderBottom: "1.5px solid #C9A227" }}>
+                  Student Information
+                </div>
+                {[
+                  { label: "Name",     value: profile.fullName },
+                  { label: "Father",   value: profile.fatherName },
+                  { label: "CNIC",     value: profile.cnic },
+                  { label: "Mobile",   value: profile.mobile },
+                  { label: "City",     value: profile.city ?? "—" },
+                  ...(() => {
+                    const isPhys = (profile.admissionType ?? []).includes("physical");
+                    const list = isPhys
+                      ? (profile.physicalCourses?.length ? profile.physicalCourses : profile.courses ?? [])
+                      : (profile.courses ?? []);
+                    return list.map((c, i) => ({
+                      label: list.length > 1 ? `Course ${i + 1}` : "Course",
+                      value: formatCourse(c),
+                    }));
+                  })(),
+                ].map(({ label, value }) => (
+                  <div key={label} style={{ display: "flex", alignItems: "flex-start", marginBottom: 2, paddingBottom: 2, borderBottom: "1px solid #f0f5f1" }}>
+                    <span style={{ color: "#0B5D3B", fontWeight: 800, fontSize: 9.5, minWidth: 42, flexShrink: 0 }}>{label}</span>
+                    <span style={{ color: "#999", fontSize: 9.5, marginRight: 4, marginTop: 1 }}>:</span>
+                    <span style={{ color: "#1a1a1a", fontSize: 10, fontWeight: 600, lineHeight: 1.3, wordBreak: "break-word", minWidth: 0 }}>{value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{ background: "#073d27", borderTop: "2.5px solid #C9A227", padding: "6px 14px", display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.75)", lineHeight: 1 }}><span style={{ color: "#C9A227", fontWeight: 800 }}>Issue Date: </span>{joinDate}</div>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", lineHeight: 1 }}>www.yetp.pk</div>
+              <div style={{ fontSize: 8, color: "rgba(255,255,255,0.75)", lineHeight: 1 }}><span style={{ color: "#C9A227", fontWeight: 800 }}>Expires: </span>{expireDate}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* ══ BACK ══ */}
+        <div ref={backRef} style={{ width: CW, height: CH, background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: "0 6px 28px rgba(0,0,0,0.14)", fontFamily: "Arial,sans-serif", flexShrink: 0, display: "flex", flexDirection: "column" }}>
+
+          {/* Header */}
+          <div style={{ background: "linear-gradient(135deg,#041f14 0%,#073d27 100%)", borderBottom: "3px solid #C9A227", padding: "8px 14px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <div style={{ width: 38, height: 38, borderRadius: "50%", border: "2px solid #C9A227", padding: 2, background: "#fff", flexShrink: 0 }}>
+              <img src={logoUrl} alt="" style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }} crossOrigin="anonymous" />
+            </div>
+            <div>
+              <div style={{ color: "#C9A227", fontWeight: 900, fontSize: 10.5, letterSpacing: "0.05em", textTransform: "uppercase" }}>Youth Empowerment Training Program</div>
+              <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 7.5, letterSpacing: "0.1em", textTransform: "uppercase", marginTop: 1.5 }}>Terms &amp; Conditions</div>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div style={{ flex: 1, padding: "10px 14px", overflow: "hidden" }}>
+            <div style={{ fontSize: 9, fontWeight: 800, color: "#073d27", textTransform: "uppercase", letterSpacing: "0.08em", paddingBottom: 4, marginBottom: 8, borderBottom: "1.5px solid #C9A227" }}>
+              Card Usage Policy
+            </div>
+            {[
+              "This card is YETP property; return it when requested.",
+              "Cardholder is responsible for all activities under this card.",
+              "Non-transferable; valid only for the enrolled student.",
+              "Report any loss to YETP administration immediately.",
+              "YETP may cancel this card in case of misconduct.",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", gap: 9, marginBottom: 7, alignItems: "flex-start" }}>
+                <img src={BULLET_CIRCLES[i]} width={20} height={20} style={{ flexShrink: 0, display: "block", marginTop: 1 }} />
+                <span style={{ fontSize: 10.5, color: "#333", lineHeight: 1.4, wordBreak: "break-word", paddingTop: 2 }}>{t}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div style={{ background: "#073d27", borderTop: "2.5px solid #C9A227", padding: "6px 14px", display: "flex", justifyContent: "space-between", flexShrink: 0 }}>
+            <div style={{ fontSize: 8, color: "rgba(255,255,255,0.75)", lineHeight: 1 }}><span style={{ color: "#C9A227", fontWeight: 800 }}>Join Date: </span>{joinDate}</div>
+            <div style={{ fontSize: 8, color: "rgba(255,255,255,0.3)", letterSpacing: "0.08em", lineHeight: 1 }}>www.yetp.pk</div>
+            <div style={{ fontSize: 8, color: "rgba(255,255,255,0.75)", lineHeight: 1 }}><span style={{ color: "#C9A227", fontWeight: 800 }}>Expires: </span>{expireDate}</div>
+          </div>
+        </div>
+
+      </div>
       </div>
     </div>
   );

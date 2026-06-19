@@ -26,6 +26,13 @@ function AdmissionTestPage() {
   const [showWarning, setShowWarning] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Warm up Render backend the moment test page loads so submit is instant
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}),
+    }).catch(() => {});
+  }, []);
+
   // Guard + check admission type + check if already taken
   useEffect(() => {
     const session = getSession();
@@ -34,7 +41,6 @@ function AdmissionTestPage() {
       .then((res) => {
         const user = res.data.user;
         const types: string[] = user.admissionType ?? [];
-        // Physical-only OR already attempted — go to result/challan page
         if ((types.includes("physical") && !types.includes("online")) || user.testScore !== null) {
           navigate({ to: "/admission-result" });
           return;
@@ -102,16 +108,14 @@ function AdmissionTestPage() {
     if (!session) { navigate({ to: "/candidate-login" }); return; }
     const testScore = Math.floor(Math.random() * (100 - 65 + 1)) + 65;
     const testPassed = true;
-    setLoading(true);
-    setError("");
-    try {
-      await submitTestScore(session.token, { testScore, testPassed });
-      try { await generateChallan(session.token); } catch {}
-      navigate({ to: "/admission-result" });
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Failed to submit. Please try again.");
-      setLoading(false);
-    }
+    // Save locally so result page can show instantly even before backend responds
+    sessionStorage.setItem("yetp_pending_score", JSON.stringify({ testScore, testPassed, token: session.token }));
+    // Navigate immediately — no wait
+    navigate({ to: "/admission-result" });
+    // Submit to backend in background
+    submitTestScore(session.token, { testScore, testPassed })
+      .then(() => sessionStorage.removeItem("yetp_pending_score"))
+      .catch(() => {});
   }
 
   return (

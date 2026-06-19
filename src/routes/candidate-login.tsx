@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FiArrowRight, FiEye, FiEyeOff } from "react-icons/fi";
 import logoUrl from "@/assets/yetp.png";
 import { login as loginApi, forgotPassword, ApiError } from "@/lib/api/auth";
+import { getProfile } from "@/lib/api/user";
 import { setSession } from "@/lib/auth-session";
 
 export const Route = createFileRoute("/candidate-login")({
@@ -32,7 +33,15 @@ function CandidateLoginPage() {
     try {
       const res = await loginApi({ email, password });
       setSession({ token: res.token, user: res.user });
-      navigate({ to: "/admission-test" });
+      const profileRes = await getProfile(res.token);
+      const types: string[] = profileRes.data.user.admissionType ?? [];
+      const isPhysical = types.includes("physical") && !types.includes("online");
+      const testDone = profileRes.data.user.testScore !== null;
+      if (isPhysical || testDone) {
+        navigate({ to: "/admission-result" });
+      } else {
+        navigate({ to: "/admission-test" });
+      }
     } catch (err) {
       setLoginError(err instanceof ApiError ? err.message : "Login failed. Please try again.");
     } finally {
@@ -60,7 +69,7 @@ function CandidateLoginPage() {
       <style>{`
         .login-outer {
           background-color: #052b1c;
-          background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2000&auto=format&fit=crop');
+          background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2000&auto=format&fit=crop');
           background-size: cover;
           background-position: center;
           width: 100%;
@@ -76,7 +85,7 @@ function CandidateLoginPage() {
         .login-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(2, 24, 15, 0.68);
+          background: linear-gradient(to bottom, rgba(5,43,28,0.7), rgba(3,24,15,0.85));
           pointer-events: none;
         }
         .login-inner {
@@ -199,6 +208,7 @@ function CandidateLoginPage() {
           .login-inner {
             flex-direction: column;
             flex-wrap: nowrap !important;
+            align-items: stretch !important;
             gap: 0;
             min-height: 100vh;
             height: auto;
@@ -208,8 +218,9 @@ function CandidateLoginPage() {
           .login-left {
             position: relative;
             flex: 1 !important;
+            width: 100% !important;
             padding: 90px 20px 32px !important;
-            background-image: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2000&auto=format&fit=crop');
+            background-image: url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2000&auto=format&fit=crop');
             background-size: cover;
             background-position: center top;
             max-width: 100% !important;
@@ -219,7 +230,7 @@ function CandidateLoginPage() {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(3,12,7,0.25) 0%, rgba(3,12,7,0.40) 50%, rgba(5,19,11,0.95) 100%);
+            background: linear-gradient(to bottom, rgba(5,43,28,0.5) 0%, rgba(3,24,15,0.8) 50%, rgba(5,19,11,0.95) 100%);
             z-index: 1;
           }
           .login-left > * { position: relative; z-index: 2; }

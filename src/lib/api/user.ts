@@ -11,12 +11,15 @@ export type Profile = {
   gender: string;
   qualification: string;
   courses: string[];
+  physicalCourses?: string[];
   permanentAddress: string;
   city: string;
   referralCode?: string;
   testScore: number | null;
   testPassed: boolean;
   admissionType: string[];
+  photo?: string | null;
+  createdAt?: string;
 };
 
 export type ChallanInfo = {
