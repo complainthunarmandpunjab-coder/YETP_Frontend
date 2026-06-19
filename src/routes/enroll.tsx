@@ -265,8 +265,12 @@ function EnrollPage() {
         setRegError("Please upload both CNIC / B-Form front and back images.");
         return;
       }
-      if (cnicFront.size > MAX_FILE_SIZE || cnicBack.size > MAX_FILE_SIZE) {
-        setRegError("CNIC images must be 2MB or smaller.");
+      if (!photo) {
+        setRegError("Please upload your passport-size photo.");
+        return;
+      }
+      if (cnicFront.size > MAX_FILE_SIZE || cnicBack.size > MAX_FILE_SIZE || photo.size > MAX_FILE_SIZE) {
+        setRegError("Files must be 2MB or smaller.");
         return;
       }
     } else {
@@ -304,9 +308,8 @@ function EnrollPage() {
       if (enrollmentType === "online") {
         fd.append("cnicFront", cnicFront!);
         fd.append("cnicBack", cnicBack!);
-      } else {
-        fd.append("photo", photo!);
       }
+      fd.append("photo", photo!);
       const res = await signup(fd);
       setRollNumber(res.user.rollNumber);
       setView("success");
@@ -1131,32 +1134,59 @@ function EnrollPage() {
                 </div>
 
                 {enrollmentType === "online" ? (
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
-                        Upload CNIC (Front Side) <span style={{ color: "#C9A227" }}>*</span>
-                      </label>
-                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
-                        style={{ border: "1.5px solid #e0ede7", color: cnicFront ? "#073d27" : "#999" }}>
-                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
-                        <span className="truncate">{cnicFront ? cnicFront.name : "Click to choose or drop your file here"}</span>
-                        <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
-                          onChange={(e) => setCnicFront(e.target.files?.[0] || null)} />
-                      </label>
-                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                  <div className="flex flex-col gap-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                          Upload CNIC (Front Side) <span style={{ color: "#C9A227" }}>*</span>
+                        </label>
+                        <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                          style={{ border: "1.5px solid #e0ede7", color: cnicFront ? "#073d27" : "#999" }}>
+                          <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                          <span className="truncate">{cnicFront ? cnicFront.name : "Click to choose or drop your file here"}</span>
+                          <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
+                            onChange={(e) => setCnicFront(e.target.files?.[0] || null)} />
+                        </label>
+                        <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                          Upload CNIC (Back Side) <span style={{ color: "#C9A227" }}>*</span>
+                        </label>
+                        <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                          style={{ border: "1.5px solid #e0ede7", color: cnicBack ? "#073d27" : "#999" }}>
+                          <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                          <span className="truncate">{cnicBack ? cnicBack.name : "Click to choose or drop your file here"}</span>
+                          <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
+                            onChange={(e) => setCnicBack(e.target.files?.[0] || null)} />
+                        </label>
+                        <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
-                        Upload CNIC (Back Side) <span style={{ color: "#C9A227" }}>*</span>
-                      </label>
-                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
-                        style={{ border: "1.5px solid #e0ede7", color: cnicBack ? "#073d27" : "#999" }}>
-                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
-                        <span className="truncate">{cnicBack ? cnicBack.name : "Click to choose or drop your file here"}</span>
-                        <input type="file" accept="image/png,image/jpeg,application/pdf" className="hidden"
-                          onChange={(e) => setCnicBack(e.target.files?.[0] || null)} />
-                      </label>
-                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png, pdf (Max 2MB)</p>
+                    {/* Passport photo upload for online enrollment */}
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                          Passport-Size Photo <span style={{ color: "#C9A227" }}>*</span>
+                        </label>
+                        <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                          style={{ border: "1.5px solid #e0ede7", color: photo ? "#073d27" : "#999" }}>
+                          <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                          <span className="truncate">{photo ? photo.name : "Click to upload your photo"}</span>
+                          <input type="file" accept="image/png,image/jpeg,image/jfif" className="hidden"
+                            onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                        </label>
+                        <p className="mt-1 text-[10px]" style={{ color: "#999" }}>This photo will appear on your Student ID Card · jpg, jpeg, png (Max 2MB)</p>
+                      </div>
+                      {/* Card preview */}
+                      <div style={{ flexShrink: 0 }}>
+                        <div style={{ width: 62, height: 76, background: "#eaf0eb", borderRadius: 4, overflow: "hidden", border: "2px solid #C9A227", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {photo
+                            ? <img src={URL.createObjectURL(photo)} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <FiUser style={{ width: 22, height: 22, color: "#bbb" }} />}
+                        </div>
+                        <div style={{ fontSize: 9, textAlign: "center", color: "#aaa", marginTop: 3 }}>Card Preview</div>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -1164,18 +1194,28 @@ function EnrollPage() {
                     <div className="rounded-lg px-4 py-3 mb-4 text-xs leading-relaxed" style={{ background: "rgba(11,93,59,0.07)", borderLeft: "3px solid #0B5D3B", color: "#073d27" }}>
                       <strong>Physical Enrollment:</strong> Please upload a recent passport-size photo. You will be required to bring original documents (CNIC/B-Form) when you visit the institute.
                     </div>
-                    <div style={{ maxWidth: 320 }}>
-                      <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
-                        Passport-Size Photo <span style={{ color: "#C9A227" }}>*</span>
-                      </label>
-                      <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
-                        style={{ border: "1.5px solid #e0ede7", color: photo ? "#073d27" : "#999" }}>
-                        <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
-                        <span className="truncate">{photo ? photo.name : "Click to upload your photo"}</span>
-                        <input type="file" accept="image/png,image/jpeg" className="hidden"
-                          onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
-                      </label>
-                      <p className="mt-1 text-[10px]" style={{ color: "#999" }}>Accepted formats: jpg, jpeg, png (Max 2MB)</p>
+                    <div className="flex items-start gap-4" style={{ maxWidth: 400 }}>
+                      <div className="flex-1">
+                        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider" style={{ color: "#555" }}>
+                          Passport-Size Photo <span style={{ color: "#C9A227" }}>*</span>
+                        </label>
+                        <label className="flex items-center gap-2 w-full truncate rounded-lg border bg-white px-4 py-2.5 text-sm cursor-pointer"
+                          style={{ border: "1.5px solid #e0ede7", color: photo ? "#073d27" : "#999" }}>
+                          <FiUpload className="size-4 shrink-0" style={{ color: "#0B5D3B" }} />
+                          <span className="truncate">{photo ? photo.name : "Click to upload your photo"}</span>
+                          <input type="file" accept="image/png,image/jpeg,image/jfif" className="hidden"
+                            onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
+                        </label>
+                        <p className="mt-1 text-[10px]" style={{ color: "#999" }}>This photo will appear on your Student ID Card · jpg, jpeg, png (Max 2MB)</p>
+                      </div>
+                      <div style={{ flexShrink: 0 }}>
+                        <div style={{ width: 62, height: 76, background: "#eaf0eb", borderRadius: 4, overflow: "hidden", border: "2px solid #C9A227", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {photo
+                            ? <img src={URL.createObjectURL(photo)} alt="preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                            : <FiUser style={{ width: 22, height: 22, color: "#bbb" }} />}
+                        </div>
+                        <div style={{ fontSize: 9, textAlign: "center", color: "#aaa", marginTop: 3 }}>Card Preview</div>
+                      </div>
                     </div>
                   </div>
                 )}

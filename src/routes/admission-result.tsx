@@ -204,11 +204,28 @@ export default function AdmissionResultPage() {
     );
   }
 
+  const pageRespCss = `
+    .ar-score-strip { display:inline-flex; align-items:center; gap:24px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:100px; padding:10px 28px; backdrop-filter:blur(8px); }
+    .ar-deadline { background:#fffbf0; border:1px solid #f0c040; border-radius:14px; padding:14px 22px; margin-bottom:20px; display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+    .ar-deadline-right { margin-left:auto; display:flex; align-items:center; gap:8px; }
+    .ar-pay-footer { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-top:1px solid #f0f4f1; }
+    .ar-paid-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+    @media (max-width:480px) {
+      .ar-score-strip { gap:16px; padding:8px 16px; }
+      .ar-score-strip .ar-sep { display:none; }
+      .ar-deadline { flex-direction:column; align-items:flex-start; gap:6px; }
+      .ar-deadline-right { margin-left:0; }
+      .ar-pay-footer { flex-direction:column; align-items:flex-start; gap:8px; padding:12px 16px; }
+      .ar-paid-grid { grid-template-columns:1fr; }
+    }
+  `;
+
   return (
-    <div style={{ background: "#f0f4f1", minHeight: "100vh", paddingTop: 90, paddingBottom: 60, fontFamily: "'Outfit', 'Poppins', sans-serif" }}>
+    <div style={{ background: "#f0f4f1", minHeight: "100vh", paddingBottom: 60, fontFamily: "'Outfit', 'Poppins', sans-serif" }}>
+      <style>{pageRespCss}</style>
 
       {/* ══ HERO BANNER ══ */}
-      <div style={{ background: "linear-gradient(135deg, #052b1c 0%, #0B5D3B 100%)", borderBottom: "4px solid #C9A227", padding: "28px 24px" }}>
+      <div style={{ background: "linear-gradient(135deg, #052b1c 0%, #0B5D3B 100%)", borderBottom: "4px solid #C9A227", padding: "28px 24px", paddingTop: "calc(90px + 28px)" }}>
         <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
           <div style={{ width: 54, height: 54, borderRadius: "50%", background: "rgba(201,162,39,0.18)", border: "2px solid rgba(201,162,39,0.6)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
             <FiAward style={{ width: 32, height: 32, color: "#C9A227" }} />
@@ -237,17 +254,17 @@ export default function AdmissionResultPage() {
                 You are now eligible for the YETP Scholarship Card.<br />
                 Complete your application fee payment to confirm your seat.
               </p>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 24, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 100, padding: "10px 28px", backdropFilter: "blur(8px)" }}>
+              <div className="ar-score-strip">
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Score</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#C9A227", lineHeight: 1.2 }}>{testScore}%</div>
                 </div>
-                <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.2)" }} />
+                <div className="ar-sep" style={{ width: 1, height: 32, background: "rgba(255,255,255,0.2)" }} />
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Correct</div>
                   <div style={{ fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.2 }}>{correctAnswers}/{totalMcqs}</div>
                 </div>
-                <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.2)" }} />
+                <div className="ar-sep" style={{ width: 1, height: 32, background: "rgba(255,255,255,0.2)" }} />
                 <div style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.55)", letterSpacing: "0.08em", textTransform: "uppercase" }}>Result</div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", background: "#0B5D3B", border: "1.5px solid rgba(255,255,255,0.3)", borderRadius: 100, padding: "2px 14px", lineHeight: 1.8 }}>PASS</div>
@@ -320,10 +337,12 @@ export default function AdmissionResultPage() {
         </div>}
 
         {/* Fee deadline banner */}
-        <div style={{ background: "#fffbf0", border: "1px solid #f0c040", borderRadius: 14, padding: "14px 22px", marginBottom: 20, display: "flex", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "#5a3e00" }}>⏰ Last Date to Pay Processing Fee:</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{PAYMENT_DEADLINE}</span>
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="ar-deadline">
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#5a3e00" }}>⏰ Last Date to Pay Processing Fee: </span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{PAYMENT_DEADLINE}</span>
+          </div>
+          <div className="ar-deadline-right">
             <span style={{ fontSize: 14, fontWeight: 800, color: "#0B5D3B" }}>{FEE_AMOUNT}</span>
             <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 12px", borderRadius: 100, background: challan?.paid ? "#0B5D3B" : "#f0c040", color: challan?.paid ? "#fff" : "#5a3e00" }}>
               {challan?.paid ? "✓ PAID" : "PENDING"}
@@ -361,7 +380,7 @@ export default function AdmissionResultPage() {
           {/* If fee is paid — show confirmation details instead of payment options */}
           {challan?.paid && (
             <div style={{ padding: "22px 24px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div className="ar-paid-grid">
                 {[
                   { label: "Challan ID", value: challan.challanId },
                   { label: "Amount Paid", value: `Rs. ${challan.amount}` },
@@ -478,7 +497,7 @@ export default function AdmissionResultPage() {
           </>)}
 
           {/* Footer */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", borderTop: "1px solid #f0f4f1" }}>
+          <div className="ar-pay-footer">
             <span style={{ fontSize: 12, color: "#aaa" }}>
               Need help? <a href="/contact" style={{ color: "#0B5D3B", fontWeight: 700 }}>Contact Support</a>
             </span>
