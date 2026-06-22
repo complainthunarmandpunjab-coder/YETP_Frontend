@@ -39,9 +39,13 @@ function Field({ label, value, onChange, type = "text", icon: Icon }: {
   );
 }
 
+const API_URL = import.meta.env.VITE_API_URL as string;
+
 function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   return (
     <div>
@@ -122,7 +126,22 @@ function ContactPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                setError(""); setLoading(true);
+                try {
+                  const res = await fetch(`${API_URL}/api/contact`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: form.name, email: form.email, phone: form.phone, subject: form.subject, message: form.message }),
+                  });
+                  const data = await res.json();
+                  if (!res.ok) throw new Error(data.message || "Failed to send message.");
+                  setSent(true);
+                } catch (err) {
+                  setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+                } finally { setLoading(false); }
+              }}
                 className="bg-white"
                 style={{ border: "1px solid #e5e5e5", borderTop: "3px solid #0B5D3B" }}>
                 <div className="px-8 py-4 border-b flex items-center gap-3"
@@ -150,10 +169,11 @@ function ContactPage() {
                       onBlur={(e) => { e.currentTarget.style.borderColor = "#d5e8dc"; }}
                     />
                   </div>
-                  <button type="submit"
-                    className="flex items-center gap-2 px-8 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90"
+                  {error && <p className="text-xs font-semibold" style={{ color: "#c0392b" }}>{error}</p>}
+                  <button type="submit" disabled={loading}
+                    className="flex items-center gap-2 px-8 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
                     style={{ background: "#0B5D3B", borderRadius: 2 }}>
-                    Send Message <FiArrowRight />
+                    {loading ? "Sending..." : <><span>Send Message</span><FiArrowRight /></>}
                   </button>
                 </div>
               </form>
